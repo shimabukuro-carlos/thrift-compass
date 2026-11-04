@@ -20,12 +20,35 @@
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(map);
 
+    function esc(t) {
+      const d = document.createElement("div");
+      d.textContent = t;
+      return d.innerHTML;
+    }
+
+    function loadReviews(marker, s, base) {
+      if (marker.loaded) return;
+      fetch(`/api/reviews?id=${s.google_id}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.error) throw d.error;
+          marker.loaded = true;
+          const reviews = d.reviews.map(rv =>
+            `<p>${"★".repeat(rv.rating)} ${esc(rv.author)}<br>${esc(rv.text.slice(0, 150))}${rv.text.length > 150 ? "..." : ""}</p>`
+          ).join("");
+          marker.setPopupContent(`${base}<br>${d.rating} ★ (${d.count} reviews)${reviews}<a href="${d.url}" target="_blank">See all on Google Maps</a>`);
+        })
+        .catch(() => marker.setPopupContent(base + "<br><i>Reviews not available</i>"));
+    }
+
     fetch("data/stores.json")
       .then(r => r.json())
       .then(stores => {
         for (const s of stores) {
-          L.marker([s.lat, s.lon]).addTo(map)
-            .bindPopup(`<b>${s.name}</b><br>${s.address}, ${s.city}`);
+          const base = `<b>${s.name}</b><br>${s.address}, ${s.city}`;
+          const marker = L.marker([s.lat, s.lon]).addTo(map)
+            .bindPopup(base, { maxHeight: 300 });
+          if (s.google_id) marker.on("click", () => loadReviews(marker, s, base));
         }
       });
   </script>
