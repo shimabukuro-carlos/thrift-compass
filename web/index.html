@@ -9,16 +9,19 @@
   <style>
     :root {
       --maroon: #6B3035;
+      --mustard: #C8962E;
       --denim: #3E5A7A;
       --ink: #1F1A17;
+      --ink-3: #7D7268;
       --paper: #F2EBDC;
       --paper-hi: #FAF6EC;
       --line: 2.5px solid var(--ink);
       --bar: 60px;
     }
     body { margin: 0; font: 13px/1.45 "Space Mono", monospace; color: var(--ink); background: var(--paper); }
+    button { font: inherit; color: inherit; }
 
-    /* top bar, docked to the top of the page */
+    /* top bar */
     #topbar {
       position: fixed; z-index: 1001; top: 0; left: 0; right: 0; height: var(--bar); box-sizing: border-box;
       display: flex; align-items: center; gap: 10px; padding: 0 18px;
@@ -30,7 +33,7 @@
     .mark .t { left: 47.43%; top: 34.88%; width: 5.73%; height: 31.03%; }
     #topbar h1 { margin: 0; font: 24px "Shrikhand", serif; color: var(--maroon); }
 
-    /* the map fills everything under the bar */
+    /* map */
     #map { position: fixed; top: var(--bar); left: 0; right: 0; bottom: 0; background: #A8D6D2; }
     .leaflet-tile-pane { filter: sepia(.2) hue-rotate(-20deg) saturate(.75); }
 
@@ -38,13 +41,12 @@
     .win { background: var(--paper); border: var(--line); border-radius: 12px; box-shadow: 6px 6px 0 var(--ink); }
     #panel {
       position: fixed; z-index: 1000; top: calc(var(--bar) + 16px); left: 16px; bottom: 18px; width: min(370px, calc(100vw - 32px));
-      user-select: none; -webkit-user-select: none;
+      display: flex; flex-direction: column; overflow: hidden; user-select: none; -webkit-user-select: none;
       transition: transform .45s cubic-bezier(.32,.72,0,1), opacity .3s;
     }
     body.closed #panel { transform: translateX(calc(-100% - 32px)); opacity: 0; pointer-events: none; }
     .panel-head { display: flex; justify-content: flex-end; padding: 12px 12px 10px; }
 
-    /* hide / show button, same idea as Apple Maps */
     .toggle {
       width: 38px; height: 34px; padding: 0; border: var(--line); border-radius: 8px; background: var(--paper-hi);
       box-shadow: 3px 3px 0 var(--ink); cursor: pointer; display: grid; place-items: center;
@@ -54,6 +56,54 @@
     .toggle svg { width: 20px; height: 20px; fill: none; stroke: var(--ink); stroke-width: 2; }
     #open { position: fixed; z-index: 1000; top: calc(var(--bar) + 16px); left: 16px; opacity: 0; pointer-events: none; transition: opacity .2s; }
     body.closed #open { opacity: 1; pointer-events: auto; transition-delay: .2s; }
+
+    /* search */
+    .search { position: relative; display: block; margin: 0 18px 6px; }
+    .search input {
+      width: 100%; box-sizing: border-box; height: 42px; border: var(--line); border-radius: 8px; padding: 0 12px 0 36px;
+      background: var(--paper-hi); font: 13px "Space Mono", monospace; color: var(--ink); outline: none; box-shadow: 4px 4px 0 var(--ink);
+    }
+    .search input:focus { background: #fff; }
+    .search svg { position: absolute; left: 12px; top: 13px; width: 16px; height: 16px; stroke: var(--ink); }
+
+    /* two screens that slide like iPhone settings */
+    .views { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+    .view { position: absolute; inset: 0; display: flex; flex-direction: column; transition: transform .45s cubic-bezier(.32,.72,0,1), opacity .3s; }
+    .views.pushed .browse { transform: translateX(-30%); opacity: 0; pointer-events: none; }
+    .results { transform: translateX(100%); }
+    .views.pushed .results { transform: none; }
+    .scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 0 18px 14px; }
+
+    /* the three tiles */
+    .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+    .tile {
+      display: grid; justify-items: center; gap: 6px; padding: 14px 6px 12px; border: var(--line); border-radius: 10px;
+      background: var(--paper-hi); box-shadow: 4px 4px 0 var(--ink); cursor: pointer; transition: transform 90ms, box-shadow 90ms;
+    }
+    .tile:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
+    .tile:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+    .tile svg { width: 44px; height: 44px; stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+    .tile b { font-size: 12px; text-transform: uppercase; }
+    .tile em { font-size: 11px; font-style: normal; color: var(--ink-3); }
+
+    /* list of stores */
+    .rhead { display: flex; align-items: flex-end; justify-content: space-between; padding: 6px 18px 10px; border-bottom: 2.5px dashed var(--ink); margin-bottom: 4px; }
+    .back { border: 0; background: none; padding: 0; cursor: pointer; font-weight: 700; font-size: 12px; margin-bottom: 4px; }
+    .back:hover { color: var(--maroon); }
+    .rhead h2 { margin: 0; font-size: 22px; line-height: 1; text-transform: uppercase; }
+    .rhead span { font-weight: 700; }
+    .rows { list-style: none; margin: 0; padding: 0; }
+    .rows li + li { border-top: 2px dotted rgba(31,26,23,.3); }
+    .rows button {
+      width: 100%; display: grid; grid-template-columns: 12px 1fr; gap: 12px; align-items: center; text-align: left;
+      padding: 10px 6px; border: 0; border-radius: 6px; background: none; cursor: pointer;
+    }
+    .rows button:hover { background: rgba(31,26,23,.07); }
+    .rows .dot { width: 12px; height: 12px; border: 2px solid var(--ink); border-radius: 50%; box-sizing: border-box; background: var(--maroon); }
+    .rows .dot.clothing { background: var(--denim); }
+    .rows div { min-width: 0; }
+    .rows b, .rows small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rows small { font-size: 11.5px; color: var(--ink-3); }
   </style>
 </head>
 <body>
@@ -70,6 +120,40 @@
         <svg viewBox="0 0 20 20"><rect x="2" y="3" width="16" height="14" rx="3"/><path d="M8 3v14M4.5 7h1.5M4.5 10h1.5"/></svg>
       </button>
     </div>
+
+    <label class="search">
+      <svg viewBox="0 0 16 16" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>
+      <input id="q" type="search" placeholder="Search stores" autocomplete="off">
+    </label>
+
+    <div class="views" id="views">
+      <div class="view browse">
+        <div class="scroll">
+          <div class="tiles">
+            <button class="tile" data-kind="all">
+              <svg viewBox="0 0 44 44"><path d="M8 19v18h28V19" fill="#FAF6EC"/><path d="M6 9h32l3 10H3z" fill="#6B3035"/><path d="M14 9 12 19M22 9v10M30 9l2 10" stroke="#FAF6EC" stroke-width="2.5"/><path d="M6 9h32l3 10H3z" fill="none"/><path d="M18 37V27h8v10" fill="#C8962E"/></svg>
+              <b>All</b><em id="nAll"></em>
+            </button>
+            <button class="tile" data-kind="thrift">
+              <svg viewBox="0 0 44 44"><path d="M23 6h15v15L22 37 7 22z" fill="#C8962E"/><circle cx="31" cy="13" r="2.6" fill="#FAF6EC"/><path d="M31 13c-4-6-12-6-16-2" fill="none"/></svg>
+              <b>Thrift</b><em id="nThrift"></em>
+            </button>
+            <button class="tile" data-kind="clothing">
+              <svg viewBox="0 0 44 44"><path d="M16 7 6 13l4 8 5-3v19h14V18l5 3 4-8-10-6c-1 3-3 5-6 5s-5-2-6-5z" fill="#3E5A7A"/></svg>
+              <b>Clothing</b><em id="nCloth"></em>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="view results">
+        <div class="rhead">
+          <div><button class="back" id="back">◀ Back</button><h2 id="title"></h2></div>
+          <span id="count"></span>
+        </div>
+        <div class="scroll"><ul class="rows" id="list"></ul></div>
+      </div>
+    </div>
   </aside>
 
   <button class="toggle" id="open" aria-label="Show sidebar">
@@ -78,14 +162,16 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
+    const $ = id => document.getElementById(id);
+
     const map = L.map("map", { zoomControl: false }).setView([37.2707, -76.7075], 10);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(map);
 
     // sidebar hide / show
-    document.getElementById("close").onclick = () => document.body.classList.add("closed");
-    document.getElementById("open").onclick = () => document.body.classList.remove("closed");
+    $("close").onclick = () => document.body.classList.add("closed");
+    $("open").onclick = () => document.body.classList.remove("closed");
 
     function esc(t) {
       const d = document.createElement("div");
@@ -108,17 +194,81 @@
         .catch(() => marker.setPopupContent(base + "<br><i>Reviews not available</i>"));
     }
 
+    const isClothing = s => s.category === "second_hand_clothing_store";
+    const titles = { all: "All stores", thrift: "Thrift", clothing: "Clothing" };
+    let stores = [], markers = [], kind = null, query = "";
+
+    function openStore(i) {
+      const s = stores[i], m = markers[i];
+      map.flyTo([s.lat, s.lon], 14, { duration: 0.8 });
+      m.openPopup();
+      if (s.google_id) loadReviews(m, s, m.base);
+    }
+
+    function matches(s) {
+      if (kind === "thrift" && isClothing(s)) return false;
+      if (kind === "clothing" && !isClothing(s)) return false;
+      return !query || `${s.name} ${s.address} ${s.city}`.toLowerCase().includes(query);
+    }
+
+    function drawList() {
+      const active = kind || query;
+      let html = "", n = 0;
+      stores.forEach((s, i) => {
+        const ok = !active || matches(s);
+        markers[i].setStyle({ opacity: ok ? 1 : 0.2, fillOpacity: ok ? 1 : 0.2 });
+        if (active && ok) {
+          n++;
+          html += `<li><button data-i="${i}"><i class="dot${isClothing(s) ? " clothing" : ""}"></i>` +
+                  `<div><b>${esc(s.name)}</b><small>${esc(s.address || "")}, ${esc(s.city || "")}</small></div></button></li>`;
+        }
+      });
+      $("list").innerHTML = html || `<li style="padding:16px 6px;color:var(--ink-3)">Nothing matches.</li>`;
+      $("title").textContent = query ? "Results" : titles[kind] || "";
+      $("count").textContent = n;
+    }
+
+    function showList(k) {
+      kind = k;
+      drawList();
+      $("views").classList.add("pushed");
+    }
+
+    document.querySelectorAll(".tile").forEach(t => t.onclick = () => showList(t.dataset.kind));
+
+    $("back").onclick = () => {
+      kind = null; query = ""; $("q").value = "";
+      $("views").classList.remove("pushed");
+      drawList();
+    };
+
+    $("q").addEventListener("input", e => {
+      query = e.target.value.trim().toLowerCase();
+      if (query) showList(kind || "all"); else drawList();
+    });
+
+    $("list").addEventListener("click", e => {
+      const b = e.target.closest("button[data-i]");
+      if (b) openStore(+b.dataset.i);
+    });
+
     fetch("data/stores.json")
       .then(r => r.json())
-      .then(stores => {
-        for (const s of stores) {
-          const base = `<b>${s.name}</b><br>${s.address}, ${s.city}`;
-          const color = s.category === "second_hand_clothing_store" ? "#3E5A7A" : "#6B3035";
-          const marker = L.circleMarker([s.lat, s.lon], {
-            radius: 6, color: "#1F1A17", weight: 2.5, fillColor: color, fillOpacity: 1
+      .then(data => {
+        stores = data.sort((a, b) => a.name.localeCompare(b.name));
+        $("nAll").textContent = stores.length;
+        $("nThrift").textContent = stores.filter(s => !isClothing(s)).length;
+        $("nCloth").textContent = stores.filter(isClothing).length;
+
+        markers = stores.map(s => {
+          const base = `<b>${esc(s.name)}</b><br>${esc(s.address || "")}, ${esc(s.city || "")}`;
+          const m = L.circleMarker([s.lat, s.lon], {
+            radius: 6, color: "#1F1A17", weight: 2.5, fillColor: isClothing(s) ? "#3E5A7A" : "#6B3035", fillOpacity: 1
           }).addTo(map).bindPopup(base, { maxHeight: 300 });
-          if (s.google_id) marker.on("click", () => loadReviews(marker, s, base));
-        }
+          m.base = base;
+          if (s.google_id) m.on("click", () => loadReviews(m, s, base));
+          return m;
+        });
       });
   </script>
 </body>
