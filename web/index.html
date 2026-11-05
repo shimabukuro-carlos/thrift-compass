@@ -2,20 +2,43 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Thrift Compass</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body { margin: 0; height: 100vh; display: flex; flex-direction: column; font-family: sans-serif; }
-    header { padding: 12px 20px; font-size: 22px; font-weight: bold; color: white; background: #222; }
-    #map { flex: 1; }
-   </style>
+    :root {
+      --maroon: #6B3035;
+      --denim: #3E5A7A;
+      --ink: #1F1A17;
+      --paper: #F2EBDC;
+      --line: 2.5px solid var(--ink);
+    }
+    body { margin: 0; font: 13px/1.45 "Space Mono", monospace; color: var(--ink); }
+    #map { position: fixed; inset: 0; background: #A8D6D2; }
+    .leaflet-tile-pane { filter: sepia(.2) hue-rotate(-20deg) saturate(.75); }
+
+    .win { background: var(--paper); border: var(--line); border-radius: 12px; box-shadow: 6px 6px 0 var(--ink); }
+    #panel { position: fixed; z-index: 1000; top: 16px; left: 16px; bottom: 16px; width: 370px; user-select: none; -webkit-user-select: none; }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 18px; }
+    .mark { position: relative; width: 50px; height: 50px; }
+    .mark img { position: absolute; }
+    .mark .r { inset: 0; width: 100%; }
+    .mark .t { left: 47.43%; top: 34.88%; width: 5.73%; height: 31.03%; }
+    .brand h1 { margin: 0; font: 27px "Shrikhand", serif; color: var(--maroon); }
+  </style>
 </head>
 <body>
-  <header>Thrift Compass</header>
   <div id="map"></div>
+  <aside id="panel" class="win">
+    <div class="brand">
+      <div class="mark"><img class="r" src="img/ring.png" alt=""><img class="t" src="img/tie.png" alt=""></div>
+      <h1>thrift compass</h1>
+    </div>
+  </aside>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const map = L.map("map").setView([37.2707, -76.7075], 10);
+    const map = L.map("map", { zoomControl: false }).setView([37.2707, -76.7075], 10);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(map);
@@ -46,8 +69,10 @@
       .then(stores => {
         for (const s of stores) {
           const base = `<b>${s.name}</b><br>${s.address}, ${s.city}`;
-          const marker = L.marker([s.lat, s.lon]).addTo(map)
-            .bindPopup(base, { maxHeight: 300 });
+          const color = s.category === "second_hand_clothing_store" ? "#3E5A7A" : "#6B3035";
+          const marker = L.circleMarker([s.lat, s.lon], {
+            radius: 6, color: "#1F1A17", weight: 2.5, fillColor: color, fillOpacity: 1
+          }).addTo(map).bindPopup(base, { maxHeight: 300 });
           if (s.google_id) marker.on("click", () => loadReviews(marker, s, base));
         }
       });
