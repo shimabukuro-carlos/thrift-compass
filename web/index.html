@@ -12,6 +12,7 @@
       --denim: #3E5A7A;
       --ink: #1F1A17;
       --paper: #F2EBDC;
+      --paper-hi: #FAF6EC;
       --line: 2.5px solid var(--ink);
     }
     body { margin: 0; font: 13px/1.45 "Space Mono", monospace; color: var(--ink); }
@@ -19,29 +20,69 @@
     .leaflet-tile-pane { filter: sepia(.2) hue-rotate(-20deg) saturate(.75); }
 
     .win { background: var(--paper); border: var(--line); border-radius: 12px; box-shadow: 6px 6px 0 var(--ink); }
-    #panel { position: fixed; z-index: 1000; top: 16px; left: 16px; bottom: 16px; width: 370px; user-select: none; -webkit-user-select: none; }
-    .brand { display: flex; align-items: center; gap: 12px; padding: 18px; }
-    .mark { position: relative; width: 50px; height: 50px; }
+
+    /* top bar */
+    #topbar {
+      position: fixed; z-index: 1001; top: 12px; left: 12px; right: 12px; height: 56px; box-sizing: border-box;
+      display: flex; align-items: center; gap: 10px; padding: 0 16px; user-select: none; -webkit-user-select: none;
+    }
+    .mark { position: relative; width: 40px; height: 40px; flex: none; }
     .mark img { position: absolute; }
     .mark .r { inset: 0; width: 100%; }
     .mark .t { left: 47.43%; top: 34.88%; width: 5.73%; height: 31.03%; }
-    .brand h1 { margin: 0; font: 27px "Shrikhand", serif; color: var(--maroon); }
+    #topbar h1 { margin: 0; font: 24px "Shrikhand", serif; color: var(--maroon); }
+
+    /* sidebar */
+    #panel {
+      position: fixed; z-index: 1000; top: 84px; left: 12px; bottom: 12px; width: min(360px, calc(100vw - 24px));
+      user-select: none; -webkit-user-select: none;
+      transition: transform .45s cubic-bezier(.32,.72,0,1), opacity .3s;
+    }
+    body.closed #panel { transform: translateX(calc(-100% - 24px)); opacity: 0; pointer-events: none; }
+    .panel-head { display: flex; justify-content: flex-end; padding: 12px 12px 0; }
+
+    /* the sidebar button, same as Apple Maps */
+    .toggle {
+      width: 38px; height: 34px; padding: 0; border: var(--line); border-radius: 8px; background: var(--paper-hi);
+      box-shadow: 3px 3px 0 var(--ink); cursor: pointer; display: grid; place-items: center;
+      transition: transform 90ms, box-shadow 90ms;
+    }
+    .toggle:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    .toggle svg { width: 20px; height: 20px; fill: none; stroke: var(--ink); stroke-width: 2; }
+    #open { position: fixed; z-index: 1000; top: 84px; left: 12px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    body.closed #open { opacity: 1; pointer-events: auto; transition-delay: .2s; }
   </style>
 </head>
 <body>
   <div id="map"></div>
+
+  <header id="topbar" class="win">
+    <div class="mark"><img class="r" src="img/ring.png" alt=""><img class="t" src="img/tie.png" alt=""></div>
+    <h1>thrift compass</h1>
+  </header>
+
   <aside id="panel" class="win">
-    <div class="brand">
-      <div class="mark"><img class="r" src="img/ring.png" alt=""><img class="t" src="img/tie.png" alt=""></div>
-      <h1>thrift compass</h1>
+    <div class="panel-head">
+      <button class="toggle" id="close" aria-label="Hide sidebar">
+        <svg viewBox="0 0 20 20"><rect x="2" y="3" width="16" height="14" rx="3"/><path d="M8 3v14M4.5 7h1.5M4.5 10h1.5"/></svg>
+      </button>
     </div>
   </aside>
+
+  <button class="toggle" id="open" aria-label="Show sidebar">
+    <svg viewBox="0 0 20 20"><rect x="2" y="3" width="16" height="14" rx="3"/><path d="M8 3v14M4.5 7h1.5M4.5 10h1.5"/></svg>
+  </button>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const map = L.map("map", { zoomControl: false }).setView([37.2707, -76.7075], 10);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(map);
+
+    // sidebar show / hide
+    document.getElementById("close").onclick = () => document.body.classList.add("closed");
+    document.getElementById("open").onclick = () => document.body.classList.remove("closed");
 
     function esc(t) {
       const d = document.createElement("div");
