@@ -10,6 +10,7 @@
     :root {
       --maroon: #6B3035;
       --mustard: #C8962E;
+      --teal: #4E9A97;
       --denim: #3E5A7A;
       --ink: #1F1A17;
       --ink-2: #4A423C;
@@ -63,7 +64,16 @@
     body.closed #open { opacity: 1; pointer-events: auto; transition-delay: .2s; }
 
     /* search */
-    .search { position: relative; display: block; margin: 0 18px 6px; }
+    .searchrow { display: flex; gap: 10px; margin: 0 18px 6px; }
+    .search { position: relative; display: block; flex: 1; min-width: 0; }
+    .loc {
+      flex: none; width: 42px; height: 42px; padding: 0; border: var(--line); border-radius: 8px; background: var(--paper-hi);
+      box-shadow: 4px 4px 0 var(--ink); cursor: pointer; display: grid; place-items: center; transition: transform 90ms, box-shadow 90ms;
+    }
+    .loc:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+    .loc svg { width: 18px; height: 18px; fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; }
+    .loc.on { background: var(--teal); }
+    .loc.on svg { fill: var(--ink); }
     .search input {
       width: 100%; box-sizing: border-box; height: 42px; border: var(--line); border-radius: 8px; padding: 0 12px 0 36px;
       background: var(--paper-hi); font: 13px "Space Mono", monospace; color: var(--ink); outline: none; box-shadow: 4px 4px 0 var(--ink);
@@ -99,7 +109,7 @@
     .rows { list-style: none; margin: 0; padding: 0; }
     .rows li + li { border-top: 2px dotted rgba(31,26,23,.3); }
     .rows button {
-      width: 100%; display: grid; grid-template-columns: 12px 1fr; gap: 12px; align-items: center; text-align: left;
+      width: 100%; display: grid; grid-template-columns: 12px 1fr auto; gap: 12px; align-items: center; text-align: left;
       padding: 10px 6px; border: 0; border-radius: 6px; background: none; cursor: pointer;
     }
     .rows button:hover { background: rgba(31,26,23,.07); }
@@ -108,6 +118,33 @@
     .rows div { min-width: 0; }
     .rows b, .rows small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .rows small { font-size: 11.5px; color: var(--ink-3); }
+    .rows em { font-style: normal; font-weight: 700; font-size: 12px; white-space: nowrap; }
+
+    /* near you */
+    .near { margin: 24px 0 8px; font-size: 15px; }
+    .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btns button {
+      height: 40px; border: var(--line); border-radius: 8px; background: var(--paper-hi); font-weight: 700; cursor: pointer;
+      box-shadow: 3px 3px 0 var(--ink); transition: transform 90ms, box-shadow 90ms;
+    }
+    .btns button:first-child { background: var(--maroon); color: var(--paper); }
+    .btns button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    .dist { margin-top: 6px; font-weight: 700; }
+
+    /* your start on the map */
+    .me::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: rgba(78,154,151,.35); animation: ping 2s ease-out infinite; }
+    .me::after { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: var(--teal); border: 2.5px solid var(--ink); box-sizing: border-box; }
+    @keyframes ping { from { transform: scale(.6); opacity: 1; } to { transform: scale(2); opacity: 0; } }
+
+    /* "tap the map" message */
+    #toast {
+      position: fixed; z-index: 1002; top: calc(var(--bar) + 16px); left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 14px; font-weight: 700;
+      max-width: calc(100vw - 32px); box-sizing: border-box; box-shadow: 3px 3px 0 var(--ink);
+    }
+    #toast[hidden] { display: none; }
+    #toast button { height: 30px; padding: 0 10px; border: var(--line); border-radius: 6px; background: var(--paper-hi); font-weight: 700; cursor: pointer; }
+    body.picking .leaflet-container { cursor: crosshair; }
 
     /* store page */
     .shead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 4px 18px 0; }
@@ -170,10 +207,13 @@
       </button>
     </div>
 
-    <label class="search">
-      <svg viewBox="0 0 16 16" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>
-      <input id="q" type="search" placeholder="Search stores" autocomplete="off">
-    </label>
+    <div class="searchrow">
+      <label class="search">
+        <svg viewBox="0 0 16 16" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>
+        <input id="q" type="search" placeholder="Search stores" autocomplete="off">
+      </label>
+      <button class="loc" id="loc" aria-label="Use my location"><svg viewBox="0 0 18 18"><path d="M15.5 2.5 2.5 8l6 1.5L10 15.5z"/></svg></button>
+    </div>
 
     <div class="views">
       <div class="view" id="vBrowse">
@@ -192,6 +232,8 @@
               <b>Clothing</b><em id="nCloth"></em>
             </button>
           </div>
+          <h3 class="near">Near you</h3>
+          <div id="nearBox"></div>
         </div>
       </div>
 
@@ -211,12 +253,15 @@
         <div class="scroll">
           <h2 id="sName"></h2>
           <div class="addr" id="sAddr"></div>
+          <div class="dist" id="sDist"></div>
           <a class="btn" id="sDir" target="_blank" rel="noopener">Directions</a>
           <div id="sReviews"></div>
         </div>
       </div>
     </div>
   </aside>
+
+  <div id="toast" class="win" hidden><span id="toastMsg"></span><button id="toastX">Cancel</button></div>
 
   <button class="toggle" id="open" aria-label="Show sidebar">
     <svg viewBox="0 0 20 20"><rect x="2" y="3" width="16" height="14" rx="3"/><path d="M8 3v14M4.5 7h1.5M4.5 10h1.5"/></svg>
@@ -245,6 +290,18 @@
     const isClothing = s => s.category === "second_hand_clothing_store";
     const titles = { all: "All stores", thrift: "Thrift", clothing: "Clothing" };
     let stores = [], markers = [], kind = null, query = "", selected = null;
+    let start = null, startKind = null, startDot = null, order = [];
+
+    // miles between two [lat, lon] points (flat-earth is plenty for 30 miles)
+    function miles(a, b) {
+      const dy = (a[0] - b[0]) * 69, dx = (a[1] - b[1]) * 69 * Math.cos(a[0] * Math.PI / 180);
+      return Math.hypot(dx, dy);
+    }
+    const dist = i => start ? miles(start, [stores[i].lat, stores[i].lon]) : null;
+    function sortStores() {
+      order = stores.map((_, i) => i);
+      if (start) order.sort((a, b) => dist(a) - dist(b));
+    }
 
     /* ---------- which screen the sidebar shows ---------- */
     const screens = ["vBrowse", "vList", "vStore"];
@@ -267,18 +324,26 @@
     function drawList() {
       const active = kind || query;
       let html = "", n = 0;
-      stores.forEach((s, i) => {
-        const ok = !active || matches(s);
+      order.forEach(i => {
+        const s = stores[i], ok = !active || matches(s);
         if (i !== selected) markers[i].setStyle({ opacity: ok ? 1 : 0.2, fillOpacity: ok ? 1 : 0.2 });
         if (active && ok) {
           n++;
           html += `<li><button data-i="${i}"><i class="dot${isClothing(s) ? " clothing" : ""}"></i>` +
-                  `<div><b>${esc(s.name)}</b><small>${esc(s.address)}, ${esc(s.city)}</small></div></button></li>`;
+                  `<div><b>${esc(s.name)}</b><small>${esc(s.address)}, ${esc(s.city)}</small></div><em>${start ? dist(i).toFixed(1) + " mi" : ""}</em></button></li>`;
         }
       });
       $("list").innerHTML = html || `<li style="padding:16px 6px;color:var(--ink-3)">Nothing matches.</li>`;
       $("title").textContent = query ? "Results" : titles[kind] || "";
       $("count").textContent = n;
+      drawNear();
+    }
+
+    function drawNear() {
+      $("nearBox").innerHTML = start
+        ? `<ul class="rows">${order.slice(0, 5).map(i => `<li><button data-i="${i}"><i class="dot${isClothing(stores[i]) ? " clothing" : ""}"></i><div><b>${esc(stores[i].name)}</b><small>${esc(stores[i].city)}</small></div><em>${dist(i).toFixed(1)} mi</em></button></li>`).join("")}</ul>`
+        : `<div class="btns"><button data-act="locate">Use my location</button><button data-act="pick">Pick on map</button></div>`;
+      $("loc").classList.toggle("on", startKind === "me");
     }
 
     function showList(k) { kind = k; drawList(); show(1); }
@@ -293,6 +358,44 @@
       const b = e.target.closest("button[data-i]");
       if (b) select(+b.dataset.i);
     });
+    $("nearBox").addEventListener("click", e => {
+      const b = e.target.closest("button[data-i]");
+      if (b) return select(+b.dataset.i);
+      const a = e.target.closest("[data-act]");
+      if (a) a.dataset.act === "locate" ? locate() : pick(true);
+    });
+
+    /* ---------- where you start: your location, or a spot you tap on the map ---------- */
+    function setStart(lat, lon, how) {
+      start = [lat, lon]; startKind = how;
+      if (!startDot) startDot = L.marker(start, { icon: L.divIcon({ className: "me", iconSize: [22, 22] }), interactive: false }).addTo(map);
+      else startDot.setLatLng(start);
+      sortStores(); drawList();
+      if (selected !== null) showDistance(stores[selected]);
+    }
+
+    function pick(on, msg) {
+      document.body.classList.toggle("picking", on);
+      $("toast").hidden = !on;
+      $("toastMsg").textContent = msg || "Tap the map to set your start";
+    }
+    $("toastX").onclick = () => pick(false);
+    map.on("click", e => {
+      if (!document.body.classList.contains("picking")) return;
+      setStart(e.latlng.lat, e.latlng.lng, "map");
+      pick(false);
+    });
+
+    function locate() {
+      if (!navigator.geolocation) return pick(true, "Location's off. Tap the map instead.");
+      navigator.geolocation.getCurrentPosition(p => {
+        const here = [p.coords.latitude, p.coords.longitude];
+        if (miles(here, [37.2707, -76.7075]) > 45) return pick(true, "You're too far away. Tap the map instead.");
+        setStart(here[0], here[1], "me");
+        map.flyTo(here, 12, { duration: reduceMotion ? 0 : 0.8 });
+      }, () => pick(true, "Location's off. Tap the map instead."), { timeout: 8000, maximumAge: 300000 });
+    }
+    $("loc").onclick = locate;
 
     /* ---------- store page ---------- */
     function markerStyle(i, on) {
@@ -317,7 +420,7 @@
       $("sTag").className = "tag" + (isClothing(s) ? " clothing" : "");
       $("sName").textContent = s.name;
       $("sAddr").textContent = `${s.address}, ${s.city}`;
-      $("sDir").href = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}`;
+      showDistance(s);
       $("vStore").querySelector(".scroll").scrollTop = 0;
       showReviews(s);
 
@@ -331,7 +434,13 @@
       map.flyTo(center, zoom, { duration: reduceMotion ? 0 : 0.8 });
     }
 
-      $("sClose").onclick = () => {
+      function showDistance(s) {
+      const i = stores.indexOf(s);
+      $("sDist").textContent = start ? `${dist(i).toFixed(1)} mi away` : "";
+      $("sDir").href = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}` + (start ? `&origin=${start[0]},${start[1]}` : "");
+    }
+
+    $("sClose").onclick = () => {
       deselect();
       kind = null; query = ""; $("q").value = "";
       drawList();
@@ -380,6 +489,7 @@
       .then(r => r.json())
       .then(data => {
         stores = data.sort((a, b) => a.name.localeCompare(b.name));
+        sortStores();
         $("nAll").textContent = stores.length;
         $("nThrift").textContent = stores.filter(s => !isClothing(s)).length;
         $("nCloth").textContent = stores.filter(isClothing).length;
@@ -388,9 +498,10 @@
           const m = L.circleMarker([s.lat, s.lon], {
             radius: 6, color: "#1F1A17", weight: 2.5, fillColor: isClothing(s) ? "#3E5A7A" : "#6B3035", fillOpacity: 1
           }).addTo(map);
-          m.on("click", () => select(i));
+          m.on("click", () => { if (!document.body.classList.contains("picking")) select(i); });
           return m;
         });
+        drawNear();
       });
 
     /* ---------- intro, once per visit ---------- */
