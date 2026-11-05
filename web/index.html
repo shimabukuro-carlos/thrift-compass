@@ -12,11 +12,13 @@
       --mustard: #C8962E;
       --denim: #3E5A7A;
       --ink: #1F1A17;
+      --ink-2: #4A423C;
       --ink-3: #7D7268;
       --paper: #F2EBDC;
       --paper-hi: #FAF6EC;
       --line: 2.5px solid var(--ink);
       --bar: 60px;
+      --slide: .45s cubic-bezier(.32,.72,0,1);
     }
     body { margin: 0; font: 13px/1.45 "Space Mono", monospace; color: var(--ink); background: var(--paper); }
     button { font: inherit; color: inherit; }
@@ -42,18 +44,21 @@
     #panel {
       position: fixed; z-index: 1000; top: calc(var(--bar) + 16px); left: 16px; bottom: 18px; width: min(370px, calc(100vw - 32px));
       display: flex; flex-direction: column; overflow: hidden; user-select: none; -webkit-user-select: none;
-      transition: transform .45s cubic-bezier(.32,.72,0,1), opacity .3s;
+      transition: transform var(--slide), opacity .3s;
     }
     body.closed #panel { transform: translateX(calc(-100% - 32px)); opacity: 0; pointer-events: none; }
     .panel-head { display: flex; justify-content: flex-end; padding: 12px 12px 10px; }
 
-    .toggle {
-      width: 38px; height: 34px; padding: 0; border: var(--line); border-radius: 8px; background: var(--paper-hi);
+    .toggle, .x {
+      padding: 0; border: var(--line); border-radius: 8px; background: var(--paper-hi);
       box-shadow: 3px 3px 0 var(--ink); cursor: pointer; display: grid; place-items: center;
       transition: transform 90ms, box-shadow 90ms;
     }
-    .toggle:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    .toggle { width: 38px; height: 34px; }
+    .x { width: 32px; height: 32px; flex: none; }
+    .toggle:active, .x:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
     .toggle svg { width: 20px; height: 20px; fill: none; stroke: var(--ink); stroke-width: 2; }
+    .x svg { width: 11px; height: 11px; stroke: var(--ink); stroke-width: 2.6; }
     #open { position: fixed; z-index: 1000; top: calc(var(--bar) + 16px); left: 16px; opacity: 0; pointer-events: none; transition: opacity .2s; }
     body.closed #open { opacity: 1; pointer-events: auto; transition-delay: .2s; }
 
@@ -66,13 +71,12 @@
     .search input:focus { background: #fff; }
     .search svg { position: absolute; left: 12px; top: 13px; width: 16px; height: 16px; stroke: var(--ink); }
 
-    /* two screens that slide like iPhone settings */
+    /* three screens that slide like iPhone settings: tiles -> list -> store */
     .views { position: relative; flex: 1; min-height: 0; overflow: hidden; }
-    .view { position: absolute; inset: 0; display: flex; flex-direction: column; transition: transform .45s cubic-bezier(.32,.72,0,1), opacity .3s; }
-    .views.pushed .browse { transform: translateX(-30%); opacity: 0; pointer-events: none; }
-    .results { transform: translateX(100%); }
-    .views.pushed .results { transform: none; }
-    .scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 0 18px 14px; }
+    .view { position: absolute; inset: 0; display: flex; flex-direction: column; transition: transform var(--slide), opacity .3s, visibility .45s; }
+    .view.left { transform: translateX(-30%); opacity: 0; visibility: hidden; pointer-events: none; }
+    .view.right { transform: translateX(100%); visibility: hidden; pointer-events: none; }
+    .scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 0 18px 18px; }
 
     /* the three tiles */
     .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
@@ -104,11 +108,56 @@
     .rows div { min-width: 0; }
     .rows b, .rows small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .rows small { font-size: 11.5px; color: var(--ink-3); }
+
+    /* store page */
+    .shead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 4px 18px 0; }
+    .tag { display: inline-block; padding: 3px 8px; border: 2px solid var(--ink); border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--paper); background: var(--maroon); }
+    .tag.clothing { background: var(--denim); }
+    .store h2 { margin: 10px 0 4px; font-size: 20px; line-height: 1.2; }
+    .store .addr { color: var(--ink-2); }
+    .btn {
+      display: grid; place-items: center; height: 40px; margin-top: 14px; border: var(--line); border-radius: 8px;
+      background: var(--maroon); color: var(--paper); font-weight: 700; text-decoration: none; box-shadow: 3px 3px 0 var(--ink);
+      transition: transform 90ms, box-shadow 90ms;
+    }
+    .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    .score {
+      display: flex; align-items: center; gap: 14px; margin: 18px 0 14px; padding: 12px 14px; border: var(--line); border-radius: 10px;
+      background: var(--paper-hi); box-shadow: 4px 4px 0 var(--ink);
+    }
+    .score b { font-size: 34px; line-height: 1; }
+    .score .stars { color: var(--mustard); font-size: 16px; letter-spacing: 2px; }
+    .score small { display: block; color: var(--ink-3); }
+    .note { color: var(--ink-3); margin: 18px 0; }
+    .review { margin: 0 0 12px; padding: 12px 14px; border: 2px solid var(--ink); border-radius: 10px; background: var(--paper-hi); cursor: pointer; }
+    .review header { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; font-weight: 700; }
+    .review header span { color: var(--mustard); letter-spacing: 1px; white-space: nowrap; }
+    .review p { margin: 0; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+    .review.open p { -webkit-line-clamp: unset; }
+    .more { display: inline-block; margin-top: 4px; color: var(--maroon); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+
+    /* intro: radial wipe, needle settles, logo flies into the top bar */
+    @property --sweep { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+    #intro { position: fixed; inset: 0; z-index: 5000; background: var(--paper); display: grid; place-items: center; }
+    #intro[hidden] { display: none; }
+    #logo { position: relative; width: min(56vw, 320px); aspect-ratio: 1; transform-origin: 0 0; }
+    #logo .wipe {
+      position: absolute; inset: 0;
+      -webkit-mask-image: conic-gradient(from 0deg, #000 var(--sweep), transparent calc(var(--sweep) + 0.5deg));
+      mask-image: conic-gradient(from 0deg, #000 var(--sweep), transparent calc(var(--sweep) + 0.5deg));
+    }
+    #logo img { position: absolute; display: block; }
+    #logo .ring { left: 0; top: 0; width: 100%; height: 100%; }
+    #logo .tie { left: 47.43%; top: 34.88%; width: 5.73%; height: 31.03%; transform-origin: 50% 100%; opacity: 0; }
   </style>
 </head>
 <body>
+  <div id="intro" hidden aria-hidden="true">
+    <div id="logo"><div class="wipe"><img class="ring" src="img/ring.png" alt=""><img class="tie" src="img/tie.png" alt=""></div></div>
+  </div>
+
   <header id="topbar">
-    <div class="mark"><img class="r" src="img/ring.png" alt=""><img class="t" src="img/tie.png" alt=""></div>
+    <div class="mark" id="mark"><img class="r" src="img/ring.png" alt=""><img class="t" src="img/tie.png" alt=""></div>
     <h1>thrift compass</h1>
   </header>
 
@@ -126,8 +175,8 @@
       <input id="q" type="search" placeholder="Search stores" autocomplete="off">
     </label>
 
-    <div class="views" id="views">
-      <div class="view browse">
+    <div class="views">
+      <div class="view" id="vBrowse">
         <div class="scroll">
           <div class="tiles">
             <button class="tile" data-kind="all">
@@ -146,12 +195,25 @@
         </div>
       </div>
 
-      <div class="view results">
+      <div class="view right" id="vList">
         <div class="rhead">
           <div><button class="back" id="back">◀ Back</button><h2 id="title"></h2></div>
           <span id="count"></span>
         </div>
         <div class="scroll"><ul class="rows" id="list"></ul></div>
+      </div>
+
+      <div class="view right store" id="vStore">
+        <div class="shead">
+          <span class="tag" id="sTag"></span>
+          <button class="x" id="sClose" aria-label="Close store"><svg viewBox="0 0 10 10"><path d="M1 1l8 8M9 1 1 9"/></svg></button>
+        </div>
+        <div class="scroll">
+          <h2 id="sName"></h2>
+          <div class="addr" id="sAddr"></div>
+          <a class="btn" id="sDir" target="_blank" rel="noopener">Directions</a>
+          <div id="sReviews"></div>
+        </div>
       </div>
     </div>
   </aside>
@@ -163,6 +225,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const $ = id => document.getElementById(id);
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const map = L.map("map", { zoomControl: false }).setView([37.2707, -76.7075], 10);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -175,36 +238,26 @@
 
     function esc(t) {
       const d = document.createElement("div");
-      d.textContent = t;
+      d.textContent = t ?? "";
       return d.innerHTML;
-    }
-
-    function loadReviews(marker, s, base) {
-      if (marker.loaded) return;
-      fetch(`/api/reviews?id=${s.google_id}`)
-        .then(r => r.json())
-        .then(d => {
-          if (d.error) throw d.error;
-          marker.loaded = true;
-          const reviews = d.reviews.map(rv =>
-            `<p>${"★".repeat(rv.rating)} ${esc(rv.author)}<br>${esc(rv.text.slice(0, 150))}${rv.text.length > 150 ? "..." : ""}</p>`
-          ).join("");
-          marker.setPopupContent(`${base}<br>${d.rating} ★ (${d.count} reviews)${reviews}<a href="${d.url}" target="_blank">See all on Google Maps</a>`);
-        })
-        .catch(() => marker.setPopupContent(base + "<br><i>Reviews not available</i>"));
     }
 
     const isClothing = s => s.category === "second_hand_clothing_store";
     const titles = { all: "All stores", thrift: "Thrift", clothing: "Clothing" };
-    let stores = [], markers = [], kind = null, query = "";
+    let stores = [], markers = [], kind = null, query = "", selected = null;
 
-    function openStore(i) {
-      const s = stores[i], m = markers[i];
-      map.flyTo([s.lat, s.lon], 14, { duration: 0.8 });
-      m.openPopup();
-      if (s.google_id) loadReviews(m, s, m.base);
+    /* ---------- which screen the sidebar shows ---------- */
+    const screens = ["vBrowse", "vList", "vStore"];
+    let screen = 0, before = 0;
+    function show(n) {
+      screens.forEach((id, i) => {
+        $(id).classList.toggle("left", i < n);
+        $(id).classList.toggle("right", i > n);
+      });
+      screen = n;
     }
 
+    /* ---------- list ---------- */
     function matches(s) {
       if (kind === "thrift" && isClothing(s)) return false;
       if (kind === "clothing" && !isClothing(s)) return false;
@@ -216,11 +269,11 @@
       let html = "", n = 0;
       stores.forEach((s, i) => {
         const ok = !active || matches(s);
-        markers[i].setStyle({ opacity: ok ? 1 : 0.2, fillOpacity: ok ? 1 : 0.2 });
+        if (i !== selected) markers[i].setStyle({ opacity: ok ? 1 : 0.2, fillOpacity: ok ? 1 : 0.2 });
         if (active && ok) {
           n++;
           html += `<li><button data-i="${i}"><i class="dot${isClothing(s) ? " clothing" : ""}"></i>` +
-                  `<div><b>${esc(s.name)}</b><small>${esc(s.address || "")}, ${esc(s.city || "")}</small></div></button></li>`;
+                  `<div><b>${esc(s.name)}</b><small>${esc(s.address)}, ${esc(s.city)}</small></div></button></li>`;
         }
       });
       $("list").innerHTML = html || `<li style="padding:16px 6px;color:var(--ink-3)">Nothing matches.</li>`;
@@ -228,30 +281,95 @@
       $("count").textContent = n;
     }
 
-    function showList(k) {
-      kind = k;
-      drawList();
-      $("views").classList.add("pushed");
-    }
+    function showList(k) { kind = k; drawList(); show(1); }
 
     document.querySelectorAll(".tile").forEach(t => t.onclick = () => showList(t.dataset.kind));
-
-    $("back").onclick = () => {
-      kind = null; query = ""; $("q").value = "";
-      $("views").classList.remove("pushed");
-      drawList();
-    };
-
+    $("back").onclick = () => { kind = null; query = ""; $("q").value = ""; drawList(); show(0); };
     $("q").addEventListener("input", e => {
       query = e.target.value.trim().toLowerCase();
-      if (query) showList(kind || "all"); else drawList();
+      if (query) { deselect(); showList(kind || "all"); } else drawList();
     });
-
     $("list").addEventListener("click", e => {
       const b = e.target.closest("button[data-i]");
-      if (b) openStore(+b.dataset.i);
+      if (b) select(+b.dataset.i);
     });
 
+    /* ---------- store page ---------- */
+    function markerStyle(i, on) {
+      const m = markers[i];
+      m.setStyle(on ? { radius: 11, weight: 3.5, opacity: 1, fillOpacity: 1 } : { radius: 6, weight: 2.5 });
+      if (on) m.bringToFront();
+    }
+
+    function deselect() {
+      if (selected !== null) markerStyle(selected, false);
+      selected = null;
+    }
+
+    function select(i) {
+      deselect();
+      selected = i;
+      const s = stores[i];
+      markerStyle(i, true);
+      document.body.classList.remove("closed");
+
+      $("sTag").textContent = isClothing(s) ? "Clothing" : "Thrift";
+      $("sTag").className = "tag" + (isClothing(s) ? " clothing" : "");
+      $("sName").textContent = s.name;
+      $("sAddr").textContent = `${s.address}, ${s.city}`;
+      $("sDir").href = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}`;
+      $("vStore").querySelector(".scroll").scrollTop = 0;
+      showReviews(s);
+
+      if (screen !== 2) before = screen;
+      show(2);
+
+      // fly so the store lands in the middle of the map you can see, not under the sidebar
+      const zoom = Math.max(map.getZoom(), 13);
+      const shift = $("panel").getBoundingClientRect().right / 2;
+      const center = map.unproject(map.project([s.lat, s.lon], zoom).subtract([shift, 0]), zoom);
+      map.flyTo(center, zoom, { duration: reduceMotion ? 0 : 0.8 });
+    }
+
+    $("sClose").onclick = () => { deselect(); drawList(); show(before); };
+
+    /* ---------- reviews ---------- */
+    const reviewCache = {};
+    const stars = n => "★".repeat(Math.round(n)) + "☆".repeat(5 - Math.round(n));
+
+    function showReviews(s) {
+      const box = $("sReviews");
+      if (!s.google_id) { box.innerHTML = `<p class="note">No Google reviews for this store yet.</p>`; return; }
+      if (reviewCache[s.google_id]) { renderReviews(reviewCache[s.google_id]); return; }
+      box.innerHTML = `<p class="note">Loading reviews...</p>`;
+      const id = s.google_id;
+      fetch(`/api/reviews?id=${id}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.error) throw d.error;
+          reviewCache[id] = d;
+          if (stores[selected] && stores[selected].google_id === id) renderReviews(d);
+        })
+        .catch(() => {
+          if (stores[selected] && stores[selected].google_id === id) box.innerHTML = `<p class="note">Couldn't load reviews right now.</p>`;
+        });
+    }
+
+    function renderReviews(d) {
+      if (!d.rating) { $("sReviews").innerHTML = `<p class="note">No ratings on Google yet.</p>`; return; }
+      $("sReviews").innerHTML =
+        `<div class="score"><b>${d.rating.toFixed(1)}</b><div><span class="stars">${stars(d.rating)}</span><small>${d.count} reviews on Google</small></div></div>` +
+        d.reviews.map(rv => `<article class="review"><header>${esc(rv.author)}<span>${stars(rv.rating)}</span></header><p>${esc(rv.text)}</p></article>`).join("") +
+        `<a class="more" href="${d.url}" target="_blank" rel="noopener">See all on Google Maps</a>`;
+    }
+
+    // tap a review to read all of it
+    $("sReviews").addEventListener("click", e => {
+      const r = e.target.closest(".review");
+      if (r) r.classList.toggle("open");
+    });
+
+    /* ---------- stores + map dots ---------- */
     fetch("data/stores.json")
       .then(r => r.json())
       .then(data => {
@@ -260,16 +378,50 @@
         $("nThrift").textContent = stores.filter(s => !isClothing(s)).length;
         $("nCloth").textContent = stores.filter(isClothing).length;
 
-        markers = stores.map(s => {
-          const base = `<b>${esc(s.name)}</b><br>${esc(s.address || "")}, ${esc(s.city || "")}`;
+        markers = stores.map((s, i) => {
           const m = L.circleMarker([s.lat, s.lon], {
             radius: 6, color: "#1F1A17", weight: 2.5, fillColor: isClothing(s) ? "#3E5A7A" : "#6B3035", fillOpacity: 1
-          }).addTo(map).bindPopup(base, { maxHeight: 300 });
-          m.base = base;
-          if (s.google_id) m.on("click", () => loadReviews(m, s, base));
+          }).addTo(map);
+          m.on("click", () => select(i));
           return m;
         });
       });
+
+    /* ---------- intro, once per visit ---------- */
+    function playIntro() {
+      const intro = $("intro"), logo = $("logo"), wipe = logo.querySelector(".wipe"), tie = logo.querySelector(".tie");
+      const finish = () => { intro.hidden = true; $("mark").style.visibility = ""; };
+      intro.hidden = false;
+      $("mark").style.visibility = "hidden";
+
+      if (reduceMotion) {
+        tie.style.opacity = 1;
+        setTimeout(() => intro.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" }).finished.then(finish), 500);
+        return;
+      }
+
+      // 1. the ring sweeps in clockwise from north
+      wipe.animate([{ "--sweep": "0deg" }, { "--sweep": "360deg" }], { duration: 950, delay: 150, easing: "cubic-bezier(.45,0,.2,1)", fill: "both" });
+      // 2. the tie fades in, swings on its base, and settles on north
+      tie.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, delay: 1050, fill: "both" });
+      const swing = [];
+      for (let i = 0; i <= 60; i++) {
+        const t = i / 60;
+        swing.push({ rotate: (28 * Math.exp(-4.5 * t) * Math.sin(2 * Math.PI * 2.5 * t)).toFixed(2) + "deg" });
+      }
+      // 3. the compass flies into the top bar while the page shows through
+      tie.animate(swing, { duration: 1200, delay: 1250, fill: "both" }).finished.then(() => {
+        const a = logo.getBoundingClientRect(), b = $("mark").getBoundingClientRect();
+        logo.animate([{ transform: "none" }, { transform: `translate(${b.left - a.left}px, ${b.top - a.top}px) scale(${b.width / a.width})` }],
+          { duration: 700, delay: 150, easing: "cubic-bezier(.3,0,.1,1)", fill: "forwards" }).finished.then(finish);
+        intro.animate([{ backgroundColor: "rgba(242,235,220,1)" }, { backgroundColor: "rgba(242,235,220,0)" }],
+          { duration: 650, delay: 200, easing: "ease-in-out", fill: "forwards" });
+      });
+    }
+
+    let seen = false;
+    try { seen = sessionStorage.getItem("tc-intro-seen") === "1"; sessionStorage.setItem("tc-intro-seen", "1"); } catch (e) {}
+    if (!seen) playIntro();
   </script>
 </body>
 </html>
