@@ -331,7 +331,13 @@
       map.flyTo(center, zoom, { duration: reduceMotion ? 0 : 0.8 });
     }
 
-    $("sClose").onclick = () => { deselect(); drawList(); show(before); };
+      $("sClose").onclick = () => {
+      deselect();
+      kind = null; query = ""; $("q").value = "";
+      drawList();
+      show(0);
+      map.flyTo([37.2707, -76.7075], 10, { duration: reduceMotion ? 0 : 0.8 });
+    };
 
     /* ---------- reviews ---------- */
     const reviewCache = {};
