@@ -14,17 +14,15 @@
       --paper: #F2EBDC;
       --paper-hi: #FAF6EC;
       --line: 2.5px solid var(--ink);
+      --bar: 60px;
     }
-    body { margin: 0; font: 13px/1.45 "Space Mono", monospace; color: var(--ink); }
-    #map { position: fixed; inset: 0; background: #A8D6D2; }
-    .leaflet-tile-pane { filter: sepia(.2) hue-rotate(-20deg) saturate(.75); }
+    body { margin: 0; font: 13px/1.45 "Space Mono", monospace; color: var(--ink); background: var(--paper); }
 
-    .win { background: var(--paper); border: var(--line); border-radius: 12px; box-shadow: 6px 6px 0 var(--ink); }
-
-    /* top bar */
+    /* top bar, docked to the top of the page */
     #topbar {
-      position: fixed; z-index: 1001; top: 12px; left: 12px; right: 12px; height: 56px; box-sizing: border-box;
-      display: flex; align-items: center; gap: 10px; padding: 0 16px; user-select: none; -webkit-user-select: none;
+      position: fixed; z-index: 1001; top: 0; left: 0; right: 0; height: var(--bar); box-sizing: border-box;
+      display: flex; align-items: center; gap: 10px; padding: 0 18px;
+      background: var(--paper); border-bottom: var(--line); user-select: none; -webkit-user-select: none;
     }
     .mark { position: relative; width: 40px; height: 40px; flex: none; }
     .mark img { position: absolute; }
@@ -32,16 +30,21 @@
     .mark .t { left: 47.43%; top: 34.88%; width: 5.73%; height: 31.03%; }
     #topbar h1 { margin: 0; font: 24px "Shrikhand", serif; color: var(--maroon); }
 
-    /* sidebar */
+    /* the map fills everything under the bar */
+    #map { position: fixed; top: var(--bar); left: 0; right: 0; bottom: 0; background: #A8D6D2; }
+    .leaflet-tile-pane { filter: sepia(.2) hue-rotate(-20deg) saturate(.75); }
+
+    /* sidebar window */
+    .win { background: var(--paper); border: var(--line); border-radius: 12px; box-shadow: 6px 6px 0 var(--ink); }
     #panel {
-      position: fixed; z-index: 1000; top: 84px; left: 12px; bottom: 12px; width: min(360px, calc(100vw - 24px));
+      position: fixed; z-index: 1000; top: calc(var(--bar) + 16px); left: 16px; bottom: 18px; width: min(370px, calc(100vw - 32px));
       user-select: none; -webkit-user-select: none;
       transition: transform .45s cubic-bezier(.32,.72,0,1), opacity .3s;
     }
-    body.closed #panel { transform: translateX(calc(-100% - 24px)); opacity: 0; pointer-events: none; }
-    .panel-head { display: flex; justify-content: flex-end; padding: 12px 12px 0; }
+    body.closed #panel { transform: translateX(calc(-100% - 32px)); opacity: 0; pointer-events: none; }
+    .panel-head { display: flex; justify-content: flex-end; padding: 12px 12px 10px; }
 
-    /* the sidebar button, same as Apple Maps */
+    /* hide / show button, same idea as Apple Maps */
     .toggle {
       width: 38px; height: 34px; padding: 0; border: var(--line); border-radius: 8px; background: var(--paper-hi);
       box-shadow: 3px 3px 0 var(--ink); cursor: pointer; display: grid; place-items: center;
@@ -49,17 +52,17 @@
     }
     .toggle:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
     .toggle svg { width: 20px; height: 20px; fill: none; stroke: var(--ink); stroke-width: 2; }
-    #open { position: fixed; z-index: 1000; top: 84px; left: 12px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    #open { position: fixed; z-index: 1000; top: calc(var(--bar) + 16px); left: 16px; opacity: 0; pointer-events: none; transition: opacity .2s; }
     body.closed #open { opacity: 1; pointer-events: auto; transition-delay: .2s; }
   </style>
 </head>
 <body>
-  <div id="map"></div>
-
-  <header id="topbar" class="win">
+  <header id="topbar">
     <div class="mark"><img class="r" src="img/ring.png" alt=""><img class="t" src="img/tie.png" alt=""></div>
     <h1>thrift compass</h1>
   </header>
+
+  <div id="map"></div>
 
   <aside id="panel" class="win">
     <div class="panel-head">
@@ -80,7 +83,7 @@
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(map);
 
-    // sidebar show / hide
+    // sidebar hide / show
     document.getElementById("close").onclick = () => document.body.classList.add("closed");
     document.getElementById("open").onclick = () => document.body.classList.remove("closed");
 
