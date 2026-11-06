@@ -1,0 +1,108 @@
+id,name,address,city,ownership,tags,reasons
+8c2c7806-3db5-44be-b6a5-1e74e70d5cea,Thrift & Threads,9100 Pocahontas Trl,Providence Forge,independent,charity,sole location with no evidence of chain; charity: .org website
+d7c11e45-b344-4731-93ff-d484c150ba79,"Lil' Red Resale Shop, LLC",28218 King William Rd,West Point,independent,consignment,sole location with no evidence of chain; consignment: resale in name
+7f91e8a3-cb62-43d5-8fe8-2cf1ed78ef63,Disabled American Veterans Thrift Store,1937 S Church St,Smithfield,chain,charity,known chain: DAV Thrift; charity: disabled american veterans in name or website
+e28ccac5-dba7-4435-9c05-ab2fbad9d4bb,Disabled American Veterans Thrift Store,1941 Church St S,Smithfield,chain,charity,known chain: DAV Thrift; charity: disabled american veterans in name or website
+8072fb96-9ceb-479c-a844-090ad7ddc4fd,Smithfield Home Furnishings,322 Main St,Smithfield,independent,,sole location with no evidence of chain
+82fcaaad-b35b-4e81-9aa0-05da4a0d6ee2,Something Special Thrift Shop,302 Main St,Smithfield,independent,,sole location with no evidence of chain
+17e66495-be98-4572-8e1d-8bcb9d8ac1e1,Tapestri,223 Main St,Smithfield,unknown,,"problems: no website or phone, low Overture confidence (0.39)"
+377ca209-429f-40eb-bbe5-a061cd1f1aff,Gimme Shelter Thrift Shop,426 Main St,Smithfield,independent,charity,sole location with no evidence of chain; charity: shelter in name or website
+ed632261-1d00-49c0-b407-626ad849c7e7,CHKD Thrift Store,1288 Smithfield Plaza,Smithfield,chain,charity,known chain: CHKD Thrift; charity: chkd in name or website
+92edfaef-23d8-495f-9e9f-f1d5cc43d9a2,Taylor's Variety Shop,15207 Carrollton Blvd,Carrollton,independent,,sole location with no evidence of chain
+4d09a469-b888-4950-9d40-17d3cf570cb0,Hidden Treasures Llc,15147 Carrollton Blvd,Carrollton,independent,,sole location with no evidence of chain
+0fbd8052-85be-4d10-a4ec-706fca064e2d,Design & Consign LLC,9961 Warwick Blvd,Newport News,independent,consignment,sole location with no evidence of chain; consignment: consign in name
+c1af1c97-c61d-4fbd-a30c-b850f94abee0,Faith Recovery Second Chance Furniture And More,9959 Warwick Blvd,Newport News,unknown,charity,"store name at 2 locations, cannot be determined as chain or independent; charity: recovery in name or website"
+f3e4dea5-52ea-445a-818f-d941e8b620ea,Pearl Street Eclectics,9720 Warwick Blvd,Newport News,unknown,,problems: no website or phone
+4309ceac-7658-4a59-b26c-f17fbb2170fd,Mom Jeans & Memories,9720 Warwick Blvd,Newport News,unknown,,problems: low Overture confidence (0.25)
+05b8a830-e5e8-4a8b-b0b4-ec4564bbc1aa,Edglos Dream Vintage Goods,9720 Warwick Blvd,Newport News,unknown,vintage,problems: no website or phone; vintage: vintage in name
+ab7cb632-8b4b-419b-a9ce-cef78d8c23d0,Hilton Thrift,9614 Warwick Blvd,Newport News,independent,,sole location with no evidence of chain
+b2153c51-b83f-455d-94fa-3af5038153db,Design and Consign,9614 Warwick Blvd,Newport News,independent,consignment,sole location with no evidence of chain; consignment: consign in name
+da27c05f-5518-40db-b3ca-191bbbd7dc5e,Peninsula Rescue Mission Thrift Store,6200 Jefferson Ave,Newport News,independent,charity,sole location with no evidence of chain; charity: rescue mission in name or website
+622e565f-9017-48aa-8ccd-786002ed3ab7,I Second That,10178 Warwick Blvd,Newport News,independent,,sole location with no evidence of chain
+f5af1fb3-1ae7-45e0-a8fc-1eb6bfef0763,Once In A Blue Moon,10233 Warwick Blvd,Newport News,independent,,sole location with no evidence of chain
+efe711d7-2e2c-428e-b9e7-282a04a5669e,Children's Hospital of the King's Daughters Thrift Stores,4111 W Mercury Blvd,Hampton,chain,charity,known chain: CHKD Thrift; charity: children's hospital in name or website
+9ee128f8-4e5f-4399-a659-9cfbf3cf139d,Disabled American Veterans Thrift Store,4209 W Mercury Blvd,Hampton,chain,charity,known chain: DAV Thrift; charity: disabled american veterans in name or website
+77a84da6-0413-453b-ae64-62754bf1acf2,The Yard Sale,9501 Warwick Blvd,Newport News,independent,,sole location with no evidence of chain
+a2ddbc44-bd5c-4c38-8f1a-2d6e9e1badd0,Uptown connection,5838 Jefferson Ave,Newport News,independent,,sole location with no evidence of chain
+f9179764-19a7-4df8-b1c0-1f1b60d14ec0,mikes pawn shop,,Newport News,independent,,sole location with no evidence of chain
+1607c75c-f014-4304-9ef7-90ea72b509a8,David & Dianne Gift & Thrift,856 25th St,Newport News,independent,,sole location with no evidence of chain
+477d6a47-3fe0-43f4-915a-44418fc0f15a,Don & Ron Thrift Outlet,2027 W Pembroke Ave,Hampton,independent,,sole location with no evidence of chain
+33c9ebcf-22b4-4585-b33d-1b00e40f711f,Hampton Roads Thrift,1517 Aberdeen Rd,Hampton,unknown,,"store name at 2 locations, cannot be determined as chain or independent"
+357d2ac0-3239-44df-a6cb-1049431aa3e0,CHKD Thrift Store,2320 W Mercury Blvd,Hampton,chain,charity,known chain: CHKD Thrift; charity: chkd in name or website
+f6bbcb7e-9147-452b-8943-eddee92e8f89,Goodwill,1911 Saville Row,Hampton,chain,charity,known chain: Goodwill; charity: goodwill in name or website
+65fb006f-77bd-4bf1-8259-388b6e4ebd2f,Deals 4 Real Outlet Llc,1225 W Pembroke Ave,Hampton,independent,,sole location with no evidence of chain
+d7c2b091-62d4-4bea-b529-d35b9ab03dbc,Hampton Roads Thrift Store,1314 W Pembroke Ave,Hampton,unknown,,"store name at 2 locations, cannot be determined as chain or independent"
+279c8870-521a-4362-af73-fc94b9b045d5,Exchange USA,118 E Mellen St,Hampton,independent,,sole location with no evidence of chain
+3f6e51ec-5732-4e7d-b11e-02747b3190f5,Worn & Homespun,12 Old Town Ln,Hampton,independent,,sole location with no evidence of chain
+2605f40a-817e-46ec-b3ca-01bb275dcff4,Salvage Boyz,47 E Queens Way,Hampton,independent,,sole location with no evidence of chain
+03f01061-40d2-4f02-94c4-46f0ca5b800b,Two Trolls,5251 John Tyler Hwy #57,Williamsburg,independent,,sole location with no evidence of chain
+e26b20c7-db3f-486c-bd95-832d243b8aa7,Thread Local 360,5251 John Tyler Hwy,Williamsburg,unknown,,problems: low Overture confidence (0.14)
+7bc57560-447e-4073-8a13-3e6b53a82e66,"Plato's Closet- Williamsburg, VA",1248 Richmond Rd,Williamsburg,chain,,known chain: Plato's Closet
+d6ba7eb1-e002-4d7b-9371-3f4a31fed773,Goodwill,1310 Richmond Rd,Williamsburg,chain,charity,known chain: Goodwill; charity: goodwill in name or website
+ffc67a82-3fb2-4154-8782-bbddd37c083d,Children's Hospital of the King's Daughters Thrift Stores,218 Monticello Ave,Williamsburg,chain,charity,known chain: CHKD Thrift; charity: children's hospital in name or website
+0187c81f-0c1d-4d8f-8415-f9be855f4614,Parker & Peony Boutique,5711 Richmond Rd Ste 83,Williamsburg,independent,,sole location with no evidence of chain
+de7f9845-304e-4e26-a4cd-d66f7bd186ca,Sugar & Spice Consignment Boutique,6536 Richmond Rd,Williamsburg,independent,consignment,sole location with no evidence of chain; consignment: consign in name
+7e753c9e-990b-4cd4-9c06-4ef8afd98de1,New2You Thrift Store,4500 John Tyler Hwy,Williamsburg,independent,charity,sole location with no evidence of chain; charity: .org website
+987f8ab7-d13c-4919-b863-e38f9a325aff,3 Doors Down,4506 John Tyler Hwy,Williamsburg,independent,,sole location with no evidence of chain
+ad38cdad-0997-4566-8639-07e7cba21666,Goodwill,4501 News Rd,Williamsburg,chain,charity,known chain: Goodwill; charity: goodwill in name or website
+ea6fa423-8bc7-496b-aac3-39aec089c3ed,Goodwill,10600 Fords Colony Lane,Glen Allen,chain,charity,known chain: Goodwill; charity: goodwill in name or website
+3ed39654-a417-467e-b23a-9335f730a242,Faith Recovery Second Chance Furniture and More,7463 Richmond Rd,Williamsburg,unknown,charity,"store name at 2 locations, cannot be determined as chain or independent; charity: recovery in name or website"
+7fc29bbd-ce45-4afb-8205-ca7d88014a2c,Twice Blessed,290 W Euclid Blvd,West Point,independent,,sole location with no evidence of chain
+9d273032-6787-44d1-abb5-68a0dc382575,Remix Market Williamsburg,7812 Richmond Rd,Toano,chain,,known chain: Remix Market
+4a1649fb-6118-47ce-bde8-e2274c3e8c91,2nd Time Around Thrift Shop,391 Hillard St,Urbanna,independent,,sole location with no evidence of chain
+0a90a91b-cd22-414d-b396-6782cfc34043,DAV Thrift Store,440 Merrimac Trail,Williamsburg,chain,charity,known chain: DAV Thrift; charity: dav in name or website
+f33295dc-fabe-49ef-91eb-8886624f5cdc,SCFE Whistle Stop Thrift Store,671 Victory Blvd,Newport News,independent,,sole location with no evidence of chain
+c0178c0f-f657-4983-a363-5a808a9facfb,Kyngz Furniture & Thrift,14346 Warwick Blvd  Ste 359,Newport News,independent,,sole location with no evidence of chain
+4ea97ef9-e7a9-4af7-b02f-bed4ef0a8c98,Disabled American Veterans Thrift Store,15265 Warwick Blvd,Newport News,chain,charity,known chain: DAV Thrift; charity: disabled american veterans in name or website
+b675d1a3-e58e-411a-abfc-00678b9ae041,Habitat ReStore - Newport News,371 Chatham Dr,Newport News,chain,charity,known chain: Habitat ReStore; charity: habitat in name or website
+2a9c8e71-ceab-4ba8-b203-02d8f76b161c,Goodwill,12638 Jefferson Ave #30,Newport News,chain,charity,known chain: Goodwill; charity: goodwill in name or website
+674b1a68-5a9a-4ea1-943e-a07d299bbcb9,Nearlynew Homecenter,12715 Warwick Blvd,Newport News,independent,,sole location with no evidence of chain
+eea2b54a-63e4-4064-9ff3-ea68990a67a4,Once Upon A Child,12233 Jefferson Ave,Newport News,chain,,known chain: Once Upon A Child
+9182e29c-7c49-402d-9d09-eaf2dec2ab84,Plato's Closet,12233 Jefferson Ave.,Newport News,chain,,known chain: Plato's Closet
+78bc0ac0-3861-4a7a-8afc-50cd472668e0,Goodwill Attended Donation Center,2324 George Washington Memorial Highway,Gloucester Point,chain,charity,known chain: Goodwill; charity: goodwill in name or website
+f6ebc78f-4401-4afd-8971-79614eb580d7,New Beginning Thrift Store,3536 George Washington Memorial Hwy,Hayes,independent,charity,sole location with no evidence of chain; charity: shelter in name or website
+f15898e5-5f8e-4195-8b8c-6a02bd3952c0,NIFTY thrifty,7057 Linda Cir,Hayes,independent,,sole location with no evidence of chain
+a5b71c90-8f9b-403d-8dba-523224827415,Habitat for Humanity ReStore,3727 S George Washington Mem Hwy,Hayes,chain,charity,known chain: Habitat ReStore; charity: habitat in name or website
+7ec19a8d-bd91-404b-a225-688154ed3f01,S and J Thrift Store,7068 Longview Dr,Hayes,independent,,sole location with no evidence of chain
+37e8bd49-c2bd-4501-bc62-56b433d6e2ce,CHKD Thrift Stores,7138 Hayes Shopping Ct,Hayes,chain,charity,known chain: CHKD Thrift; charity: chkd in name or website
+6a59e12a-bebf-4d24-bc1c-dba40b262610,Disabled American Veterans,6899 Main St,Gloucester,chain,charity,known chain: DAV Thrift; charity: disabled american veterans in name or website
+ed0287ac-7eee-4d41-93b1-5db434b55751,DAV Thrift Store,6899 Main St,Gloucester,chain,charity,known chain: DAV Thrift; charity: dav in name or website
+5af11d36-a481-4f53-9eaf-843b9d89f009,Helping The Homeless Thrift Store,7028 S George Washington Mem Hwy,Gloucester,independent,charity,sole location with no evidence of chain; charity: homeless in name or website
+4a74db42-d933-4eb4-b969-ecad7d577af4,This & That,6053 George Washington Memorial Hwy,Gloucester,unknown,,problems: no website or phone
+3c95791d-3c9f-4fd2-b0ae-e73eace96954,TOM'S SHACK THRIFT STORE,7578 General Puller Hwy,Locust Hill,independent,,sole location with no evidence of chain
+982bf52a-82e3-43b0-95ec-a45db83f09ee,Village Thrift,12436 Warwick Blvd,Newport News,unknown,,"store name at 2 locations, cannot be determined as chain or independent"
+f97f3636-274d-441b-8d02-26dd94121927,Patti's Place,7330 George Washington Mem Hwy,Yorktown,unknown,,problems: low Overture confidence (0.33)
+56f97c8f-80cd-4d02-913a-5f1faec6ab75,Donations One Stop Thrift Shop,,Yorktown,independent,,sole location with no evidence of chain
+8fcc5c56-fac2-40ef-977e-d683de6ed1bd,Groovy Tuesday VA,7330 George Washington Mem Hwy,Yorktown,unknown,,problems: low Overture confidence (0.32)
+12ebe007-7d8f-48b1-b5f8-3c321dc97bac,Jody's Journey,7330 George Washington Mem Hwy,Yorktown,unknown,,"problems: no website or phone, low Overture confidence (0.33)"
+551a74b1-344b-4c48-9859-b3971e01f380,Alley Cat Furniture,7330 George Washington Mem Hwy,Yorktown,independent,,sole location with no evidence of chain
+83324ab8-d9e0-47d7-a1c0-0aad6a5d2008,Islander Antiquities,7330 George Washington Memorial Hwy,Yorktown,independent,vintage,sole location with no evidence of chain; vintage: antiquit in name
+99ca785e-f379-4fff-89fb-9bef8fcc436d,The Curio Garden,7330 George Washington Memorial Hwy,Yorktown,unknown,vintage,problems: low Overture confidence (0.22); vintage: curio in name
+31c26c46-3a17-442c-a92c-68c7b69e74f4,Goodwill,11061 Warwick Blvd,Newport News,chain,charity,known chain: Goodwill; charity: goodwill in name or website
+b0e45555-abdb-4646-b03b-b96ac63c20df,CHKD Thrift Store,11049 Warwick Blvd,Newport News,chain,charity,known chain: CHKD Thrift; charity: chkd in name or website
+4a4012e8-a2df-4202-a4d9-0374a0077bfa,Village Thrift,11006 Warwick Blvd,Newport News,unknown,,"store name at 2 locations, cannot be determined as chain or independent"
+06a2c5e5-61dd-4ff7-b6ff-cf85be4f9f2b,Village Thrift - Hilton,10818 Warwick Blvd,Newport News,unknown,,"store name at 2 locations, cannot be determined as chain or independent"
+eebdedfb-1f4f-472c-b02d-14c7504215d9,The Twisted Rose Consignment Boutique,10745 Jefferson Ave,Newport News,unknown,consignment,problems: low Overture confidence (0.45); consignment: consign in name
+ca8fa220-6769-4237-80de-021fc3f0e938,A&G Thrift and Supplies,10738 Jefferson Ave,Newport News,independent,,sole location with no evidence of chain
+11e2da49-b0d0-46c8-bc66-e45ddef4fd52,Secondhand Stylish,1188 Big Bethel Rd,Hampton,independent,,sole location with no evidence of chain
+f9fb8802-e322-42be-abbc-d62cf937fe7a,"Goodwill Industries International, Inc.",1911 Saville Row,Hampton,chain,charity,known chain: Goodwill; charity: goodwill in name or website
+88e75084-23ff-4c13-856c-b42f6a9d8909,Lilly and Lane Consignment Boutique,3301 Hampton Hwy,Yorktown,independent,consignment,sole location with no evidence of chain; consignment: consign in name
+ec60a002-a0cd-40d4-9f14-f1ee36651945,"The Parish Thrift Shop, Inc.",487 Wythe Creek Rd,Poquoson,independent,charity,sole location with no evidence of chain; charity: parish in name or website
+292a4f6f-ef7a-47fe-9fb4-310b5c436cf0,Colonna and Co. Consignment and New,4112 George Washington Mem Hwy,Yorktown,independent,consignment,sole location with no evidence of chain; consignment: consign in name
+3fc38537-e71e-49c4-ad65-a6a2eac7c219,Vintage Faire,4909 George Washington Mem Hwy,Yorktown,independent,vintage,sole location with no evidence of chain; vintage: vintage in name
+5c6b061c-a86a-4404-9d60-adb7f0a354a8,Pea Soup for Home,4906 George Washington Memorial Hwy,Yorktown,independent,,sole location with no evidence of chain
+0f2b6509-01e0-4743-acb0-4013ae773dc6,Habitat ReStore,4824 George Washington Memorial Hwy,Yorktown,chain,charity,known chain: Habitat ReStore; charity: habitat in name or website
+5fddc58f-1752-4d5d-9035-25314bdf4726,York County Volunteer Association,222 Dare Rd,Yorktown,independent,charity,sole location with no evidence of chain; charity: volunteer in name or website
+8eea617b-53bf-412e-9535-b0c992ca7b61,The Bargain Box,222 Dare Rd,Yorktown,independent,charity,sole location with no evidence of chain; charity: .org website
+0159fcae-2215-4d09-98dc-cf5e7b5d058e,Goodwill,5234 George Washington Memorial Hwy,Yorktown,chain,charity,known chain: Goodwill; charity: goodwill in name or website
+6d4616cd-9aa8-4f3a-b984-5edad24e5401,Langley Thrift Shop,74 Burrell Loop Rd,Hampton,independent,,sole location with no evidence of chain
+0ce4a704-af8a-4376-8d33-ba600a264099,Langley Community Thrift Store,68 Walnut Ave,Hampton,independent,charity,sole location with no evidence of chain; charity: spouses in name or website
+f437cbb3-191d-454f-b7a0-dc0834771bcc,Humane Society Gift and Thrift Boutique,"Willow Oaks Shopping Center, 227 Fox Hill Rd",Hampton,independent,charity,sole location with no evidence of chain; charity: humane society in name or website
+efc1b904-5676-4b32-b227-13df1415d276,Humane Society Gift and Thrift Boutique,"Willow Oaks Shopping Center, 227 Fox Hill Rd",Hampton,independent,charity,sole location with no evidence of chain; charity: humane society in name or website
+fd1205fd-8d6b-449c-bb29-432216b50a88,Boys & Girls Club Of America,1961 E Pembroke Ave,Hampton,independent,charity,sole location with no evidence of chain; charity: boys & girls in name or website
+8051735f-d925-4705-9ece-a609822273f1,"Antiques, Uniques & More Of Deltaville",15811 General Puller Hwy,Deltaville,independent,vintage,sole location with no evidence of chain; vintage: antique in name
+e245d1f5-3d31-41a2-8d8c-aa384e713c3b,Second Chance Thrift Store,8303 Buckley Hall Rd,Hudgins,unknown,,problems: low Overture confidence (0.23)
+b9560de3-9aec-46ae-87a7-fba84188d275,DoodleBugs Consignment,240 Main St,Mathews,independent,consignment,sole location with no evidence of chain; consignment: consign in name
+1145c496-32e0-455d-9772-806fd1364e10,It's Bazaar,16 Church St,Mathews,independent,,sole location with no evidence of chain
+76f0711d-7295-4d84-a825-e7040909504e,Rise as One Thrift Virginia,122 Main St,Mathews,independent,,sole location with no evidence of chain
+276a3f5f-8ec0-4a39-ac53-8534a9c8d30f,Etc. Vintage,2066 Buckley Hall Rd,Dutton,independent,vintage,sole location with no evidence of chain; vintage: vintage in name
