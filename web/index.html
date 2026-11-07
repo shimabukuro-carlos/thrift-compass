@@ -68,7 +68,8 @@
       transition: transform var(--slide), opacity .3s;
     }
     body.closed #panel { transform: translateX(calc(-100% - 32px)); opacity: 0; pointer-events: none; }
-    .panel-head { display: flex; justify-content: flex-end; padding: 12px 12px 10px; }
+    .panel-head { display: flex; gap: 10px; padding: 16px 18px 10px; }
+    .panel-head .toggle { width: 42px; height: 42px; flex: none; }
 
     .toggle, .x {
       padding: 0; border: var(--line); border-radius: 8px; background: var(--paper-hi);
@@ -84,11 +85,10 @@
     body.closed #open { opacity: 1; pointer-events: auto; transition-delay: .2s; }
 
     /* search */
-    .searchrow { display: flex; gap: 10px; margin: 0 18px 6px; }
     .search { position: relative; display: block; flex: 1; min-width: 0; }
     .loc {
-      flex: none; width: 42px; height: 42px; padding: 0; border: var(--line); border-radius: 8px; background: var(--paper-hi);
-      box-shadow: 4px 4px 0 var(--ink); cursor: pointer; display: grid; place-items: center; transition: transform 90ms, box-shadow 90ms;
+      flex: none; width: 34px; height: 34px; padding: 0; border: var(--line); border-radius: 8px; background: var(--paper-hi);
+      box-shadow: 3px 3px 0 var(--ink); cursor: pointer; display: grid; place-items: center; transition: transform 90ms, box-shadow 90ms;
     }
     .loc:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
     .loc svg { width: 18px; height: 18px; fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; }
@@ -153,7 +153,17 @@
     .rows em { font-style: normal; font-weight: 700; font-size: 12px; white-space: nowrap; }
 
     /* near you */
-    .near { margin: 24px 0 8px; font-size: 15px; }
+    .nearhead { display: flex; align-items: center; justify-content: space-between; margin: 24px 0 10px; }
+    .near { margin: 0; font-size: 15px; }
+
+    /* what the dot colors mean */
+    .key { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--ink); border-radius: 50%; margin-right: 5px; vertical-align: -1px; background: #6B3035; }
+    .key.clothes { background: #E0A526; }
+    .key.vintage { background: #C8642C; }
+    #legend {
+      position: fixed; z-index: 999; right: calc(var(--bezel) + 12px); bottom: calc(var(--bezel) + 30px);
+      display: grid; gap: 6px; padding: 10px 12px; font-size: 12px; font-weight: 700; border-radius: 10px; box-shadow: 4px 4px 0 var(--ink);
+    }
     .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .btns button {
       height: 40px; border: var(--line); border-radius: 8px; background: var(--paper-hi); font-weight: 700; cursor: pointer;
@@ -237,17 +247,13 @@
 
   <aside id="panel" class="win">
     <div class="panel-head">
-      <button class="toggle" id="close" aria-label="Hide sidebar">
-        <svg viewBox="0 0 20 20"><rect x="2" y="3" width="16" height="14" rx="3"/><path d="M8 3v14M4.5 7h1.5M4.5 10h1.5"/></svg>
-      </button>
-    </div>
-
-    <div class="searchrow">
       <label class="search">
         <svg viewBox="0 0 16 16" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>
         <input id="q" type="search" placeholder="Search stores" autocomplete="off">
       </label>
-      <button class="loc" id="loc" aria-label="Use my location"><svg viewBox="0 0 18 18"><path d="M15.5 2.5 2.5 8l6 1.5L10 15.5z"/></svg></button>
+      <button class="toggle" id="close" aria-label="Hide sidebar">
+        <svg viewBox="0 0 20 20"><rect x="2" y="3" width="16" height="14" rx="3"/><path d="M8 3v14M4.5 7h1.5M4.5 10h1.5"/></svg>
+      </button>
     </div>
     <div class="chips">
       <button class="chip" data-f="local" aria-pressed="false">Local</button>
@@ -259,12 +265,12 @@
       <div class="view" id="vBrowse">
         <div class="scroll">
           <div class="tiles">
-            <button class="tile" data-kind="thrift"><img src="img/cats/thrift.png" alt=""><b>Thrift stores</b><em id="n_thrift"></em></button>
-            <button class="tile" data-kind="clothes"><img src="img/cats/clothes.png" alt=""><b>Clothes</b><em id="n_clothes"></em></button>
-            <button class="tile" data-kind="vintage"><img src="img/cats/vintage.png" alt=""><b>Vintage</b><em id="n_vintage"></em></button>
+            <button class="tile" data-kind="thrift"><img src="img/cats/thrift.png" alt=""><b>Thrift stores</b><em><i class="key thrift"></i><span id="n_thrift"></span></em></button>
+            <button class="tile" data-kind="clothes"><img src="img/cats/clothes.png" alt=""><b>Clothes</b><em><i class="key clothes"></i><span id="n_clothes"></span></em></button>
+            <button class="tile" data-kind="vintage"><img src="img/cats/vintage.png" alt=""><b>Vintage</b><em><i class="key vintage"></i><span id="n_vintage"></span></em></button>
           </div>
           <button class="allbar" data-kind="all"><span>All stores</span><span id="nAll"></span></button>
-          <h3 class="near">Near you</h3>
+          <div class="nearhead"><h3 class="near">Near you</h3><button class="loc" id="loc" aria-label="Use my location"><svg viewBox="0 0 18 18"><path d="M15.5 2.5 2.5 8l6 1.5L10 15.5z"/></svg></button></div>
           <div id="nearBox"></div>
         </div>
       </div>
@@ -294,6 +300,12 @@
   </aside>
 
   <div id="toast" class="win" hidden><span id="toastMsg"></span><button id="toastX">Cancel</button></div>
+
+  <div id="legend" class="win">
+    <span><i class="key thrift"></i>Thrift stores</span>
+    <span><i class="key clothes"></i>Clothes</span>
+    <span><i class="key vintage"></i>Vintage</span>
+  </div>
 
   <button class="toggle" id="open" aria-label="Show sidebar">
     <svg viewBox="0 0 20 20"><rect x="2" y="3" width="16" height="14" rx="3"/><path d="M8 3v14M4.5 7h1.5M4.5 10h1.5"/></svg>
