@@ -116,9 +116,20 @@
     }
     .tile:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
     .tile:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
-    .tile svg { width: 44px; height: 44px; stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+    .tile img { width: 64px; height: 56px; object-fit: contain; filter: drop-shadow(2px 2px 0 rgba(31,26,23,.2)); }
     .tile b { font-size: 12px; text-transform: uppercase; }
     .tile em { font-size: 11px; font-style: normal; color: var(--ink-3); }
+    .allbar {
+      width: 100%; height: 42px; margin-top: 14px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between;
+      border: var(--line); border-radius: 10px; background: var(--paper-hi); box-shadow: 4px 4px 0 var(--ink);
+      font-weight: 700; cursor: pointer; transition: transform 90ms, box-shadow 90ms;
+    }
+    .allbar:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+
+    /* filter chips */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 18px 10px; }
+    .chip { height: 30px; padding: 0 12px; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper-hi); font-size: 12px; font-weight: 700; cursor: pointer; }
+    .chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
 
     /* list of stores */
     .rhead { display: flex; align-items: flex-end; justify-content: space-between; padding: 6px 18px 10px; border-bottom: 2.5px dashed var(--ink); margin-bottom: 4px; }
@@ -134,7 +145,8 @@
     }
     .rows button:hover { background: rgba(31,26,23,.07); }
     .rows .dot { width: 12px; height: 12px; border: 2px solid var(--ink); border-radius: 50%; box-sizing: border-box; background: var(--maroon); }
-    .rows .dot.clothing { background: var(--denim); }
+    .rows .dot.clothes { background: #E0A526; }
+    .rows .dot.vintage { background: #C8642C; }
     .rows div { min-width: 0; }
     .rows b, .rows small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .rows small { font-size: 11.5px; color: var(--ink-3); }
@@ -169,7 +181,10 @@
     /* store page */
     .shead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 4px 18px 0; }
     .tag { display: inline-block; padding: 3px 8px; border: 2px solid var(--ink); border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--paper); background: var(--maroon); }
-    .tag.clothing { background: #E0A526; color: var(--ink); }
+    .tag.clothes { background: #E0A526; color: var(--ink); }
+    .tag.vintage { background: #C8642C; }
+    .tag.soft { background: var(--paper-hi); color: var(--ink); }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
     .store h2 { margin: 10px 0 4px; font-size: 20px; line-height: 1.2; }
     .store .addr { color: var(--ink-2); }
     .btn {
@@ -234,24 +249,21 @@
       </label>
       <button class="loc" id="loc" aria-label="Use my location"><svg viewBox="0 0 18 18"><path d="M15.5 2.5 2.5 8l6 1.5L10 15.5z"/></svg></button>
     </div>
+    <div class="chips">
+      <button class="chip" data-f="local" aria-pressed="false">Local</button>
+      <button class="chip" data-f="gives" aria-pressed="false">Charity</button>
+      <button class="chip" data-f="near" aria-pressed="false">Within 10 mi</button>
+    </div>
 
     <div class="views">
       <div class="view" id="vBrowse">
         <div class="scroll">
           <div class="tiles">
-            <button class="tile" data-kind="all">
-              <svg viewBox="0 0 44 44"><path d="M8 19v18h28V19" fill="#FAF6EC"/><path d="M6 9h32l3 10H3z" fill="#6B3035"/><path d="M14 9 12 19M22 9v10M30 9l2 10" stroke="#FAF6EC" stroke-width="2.5"/><path d="M6 9h32l3 10H3z" fill="none"/><path d="M18 37V27h8v10" fill="#C8962E"/></svg>
-              <b>All</b><em id="nAll"></em>
-            </button>
-            <button class="tile" data-kind="thrift">
-              <svg viewBox="0 0 44 44"><path d="M23 6h15v15L22 37 7 22z" fill="#6B3035"/><circle cx="31" cy="13" r="2.6" fill="#FAF6EC"/><path d="M31 13c-4-6-12-6-16-2" fill="none"/></svg>
-              <b>Thrift</b><em id="nThrift"></em>
-            </button>
-            <button class="tile" data-kind="clothing">
-              <svg viewBox="0 0 44 44"><path d="M16 7 6 13l4 8 5-3v19h14V18l5 3 4-8-10-6c-1 3-3 5-6 5s-5-2-6-5z" fill="#E0A526"/></svg>
-              <b>Clothing</b><em id="nCloth"></em>
-            </button>
+            <button class="tile" data-kind="thrift"><img src="img/cats/thrift.png" alt=""><b>Thrift stores</b><em id="n_thrift"></em></button>
+            <button class="tile" data-kind="clothes"><img src="img/cats/clothes.png" alt=""><b>Clothes</b><em id="n_clothes"></em></button>
+            <button class="tile" data-kind="vintage"><img src="img/cats/vintage.png" alt=""><b>Vintage</b><em id="n_vintage"></em></button>
           </div>
+          <button class="allbar" data-kind="all"><span>All stores</span><span id="nAll"></span></button>
           <h3 class="near">Near you</h3>
           <div id="nearBox"></div>
         </div>
@@ -267,7 +279,7 @@
 
       <div class="view right store" id="vStore">
         <div class="shead">
-          <span class="tag" id="sTag"></span>
+          <div class="tags" id="sTags"></div>
           <button class="x" id="sClose" aria-label="Close store"><svg viewBox="0 0 10 10"><path d="M1 1l8 8M9 1 1 9"/></svg></button>
         </div>
         <div class="scroll">
@@ -307,8 +319,14 @@
       return d.innerHTML;
     }
 
-    const isClothing = s => s.category === "second_hand_clothing_store";
-    const titles = { all: "All stores", thrift: "Thrift", clothing: "Clothing" };
+    // Caroline's tags decide the box: vintage first, then consignment or clothing stores, everything else is a thrift store
+    const KINDS = { thrift: "Thrift stores", clothes: "Clothes", vintage: "Vintage" };
+    const PIN = { thrift: "#6B3035", clothes: "#E0A526", vintage: "#C8642C" };
+    const has = (s, tag) => (s.tags || "").split("|").includes(tag);
+    const kindOf = s => has(s, "vintage") ? "vintage"
+      : has(s, "consignment") || s.category === "second_hand_clothing_store" ? "clothes" : "thrift";
+    const titles = { all: "All stores", ...KINDS };
+    const filters = new Set();
     let stores = [], markers = [], kind = null, query = "", selected = null;
     let start = null, startKind = null, startDot = null, order = [];
 
@@ -335,40 +353,57 @@
     }
 
     /* ---------- list ---------- */
+    // the chips: Local, Charity, Within 10 mi
+    function passes(s) {
+      if (filters.has("local") && s.ownership !== "independent") return false;
+      if (filters.has("gives") && !has(s, "charity")) return false;
+      if (filters.has("near") && start && miles(start, [s.lat, s.lon]) > 10) return false;
+      return true;
+    }
+
     function matches(s) {
-      if (kind === "thrift" && isClothing(s)) return false;
-      if (kind === "clothing" && !isClothing(s)) return false;
+      if (kind && kind !== "all" && kindOf(s) !== kind) return false;
+      if (!passes(s)) return false;
       return !query || `${s.name} ${s.address} ${s.city}`.toLowerCase().includes(query);
     }
 
     function drawList() {
-      const active = kind || query;
+      const active = kind || query || filters.size;
       let html = "", n = 0;
       order.forEach(i => {
         const s = stores[i], ok = !active || matches(s);
         if (i !== selected) markers[i].setStyle({ opacity: ok ? 1 : 0.2, fillOpacity: ok ? 1 : 0.2 });
         if (active && ok) {
           n++;
-          html += `<li><button data-i="${i}"><i class="dot${isClothing(s) ? " clothing" : ""}"></i>` +
+          html += `<li><button data-i="${i}"><i class="dot ${kindOf(s)}"></i>` +
                   `<div><b>${esc(s.name)}</b><small>${esc(s.address)}, ${esc(s.city)}</small></div><em>${start ? dist(i).toFixed(1) + " mi" : ""}</em></button></li>`;
         }
       });
       $("list").innerHTML = html || `<li style="padding:16px 6px;color:var(--ink-3)">Nothing matches.</li>`;
       $("title").textContent = query ? "Results" : titles[kind] || "";
       $("count").textContent = n;
+      for (const k in KINDS) $("n_" + k).textContent = stores.filter(s => kindOf(s) === k && passes(s)).length;
+      $("nAll").textContent = stores.filter(passes).length;
       drawNear();
     }
 
     function drawNear() {
       $("nearBox").innerHTML = start
-        ? `<ul class="rows">${order.slice(0, 5).map(i => `<li><button data-i="${i}"><i class="dot${isClothing(stores[i]) ? " clothing" : ""}"></i><div><b>${esc(stores[i].name)}</b><small>${esc(stores[i].city)}</small></div><em>${dist(i).toFixed(1)} mi</em></button></li>`).join("")}</ul>`
+        ? `<ul class="rows">${order.filter(i => passes(stores[i])).slice(0, 5).map(i => `<li><button data-i="${i}"><i class="dot ${kindOf(stores[i])}"></i><div><b>${esc(stores[i].name)}</b><small>${esc(stores[i].city)}</small></div><em>${dist(i).toFixed(1)} mi</em></button></li>`).join("")}</ul>`
         : `<div class="btns"><button data-act="locate">Use my location</button><button data-act="pick">Pick on map</button></div>`;
       $("loc").classList.toggle("on", startKind === "me");
     }
 
     function showList(k) { kind = k; drawList(); show(1); }
 
-    document.querySelectorAll(".tile").forEach(t => t.onclick = () => showList(t.dataset.kind));
+    document.querySelectorAll(".tile, .allbar").forEach(t => t.onclick = () => showList(t.dataset.kind));
+    document.querySelectorAll(".chip").forEach(c => c.onclick = () => {
+      const f = c.dataset.f, on = !filters.has(f);
+      if (on) filters.add(f); else filters.delete(f);
+      c.setAttribute("aria-pressed", on);
+      if (f === "near" && on && !start) locate();  // needs a start point first
+      drawList();
+    });
     $("back").onclick = () => { kind = null; query = ""; $("q").value = ""; drawList(); show(0); };
     $("q").addEventListener("input", e => {
       query = e.target.value.trim().toLowerCase();
@@ -436,8 +471,10 @@
       markerStyle(i, true);
       document.body.classList.remove("closed");
 
-      $("sTag").textContent = isClothing(s) ? "Clothing" : "Thrift";
-      $("sTag").className = "tag" + (isClothing(s) ? " clothing" : "");
+      const k = kindOf(s);
+      $("sTags").innerHTML = `<span class="tag ${k}">${KINDS[k]}</span>` +
+        (s.ownership === "independent" ? `<span class="tag soft">Local</span>` : "") +
+        (has(s, "charity") ? `<span class="tag soft">Charity</span>` : "");
       $("sName").textContent = s.name;
       $("sAddr").textContent = `${s.address}, ${s.city}`;
       showDistance(s);
@@ -510,18 +547,15 @@
       .then(data => {
         stores = data.sort((a, b) => a.name.localeCompare(b.name));
         sortStores();
-        $("nAll").textContent = stores.length;
-        $("nThrift").textContent = stores.filter(s => !isClothing(s)).length;
-        $("nCloth").textContent = stores.filter(isClothing).length;
 
         markers = stores.map((s, i) => {
           const m = L.circleMarker([s.lat, s.lon], {
-            radius: 6, color: "#1F1A17", weight: 2.5, fillColor: isClothing(s) ? "#E0A526" : "#6B3035", fillOpacity: 1
+            radius: 6, color: "#1F1A17", weight: 2.5, fillColor: PIN[kindOf(s)], fillOpacity: 1
           }).addTo(map);
           m.on("click", () => { if (!document.body.classList.contains("picking")) select(i); });
           return m;
         });
-        drawNear();
+        drawList();
       });
 
     /* ---------- intro, once per visit ---------- */
