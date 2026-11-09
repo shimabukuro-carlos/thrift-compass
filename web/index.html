@@ -63,7 +63,16 @@
       mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
     }
     #map::after { inset: var(--bezel); box-shadow: inset 0 0 0 2.5px var(--ink), inset 0 0 26px rgba(31,26,23,.3); }
-    .leaflet-bottom.leaflet-right { right: var(--bezel); bottom: var(--bezel); }
+    .leaflet-bottom.leaflet-right { right: calc(var(--bezel) + 44px); bottom: calc(var(--bezel) + 2px); }
+
+    /* map credits: tucked behind the (i) button */
+    #credit {
+      position: fixed; z-index: 1000; right: calc(var(--bezel) + 12px); bottom: calc(var(--bezel) + 12px); width: 26px; height: 26px; padding: 0;
+      border: 2px solid var(--ink); border-radius: 50%; background: var(--paper-hi); color: var(--ink); font: 700 13px "Space Mono", monospace; cursor: pointer;
+    }
+    .leaflet-control-attribution { display: none; }
+    body.credits .leaflet-control-attribution { display: block; padding: 3px 8px; border: 2px solid var(--ink); border-radius: 6px; background: var(--paper-hi); color: var(--ink); font: 11px "Space Mono", monospace; }
+    .leaflet-control-attribution a { color: var(--ink); text-decoration: underline; }
     .leaflet-top.leaflet-right { top: var(--bezel); right: var(--bezel); }
 
     /* + and - buttons */
@@ -318,6 +327,8 @@
 
   <div id="toast" class="win" hidden><span id="toastMsg"></span><button id="toastX">Cancel</button></div>
 
+  <button id="credit" aria-label="Map credits" aria-expanded="false">i</button>
+
   <button class="toggle" id="open" aria-label="Show sidebar">
     <svg viewBox="0 0 20 20"><rect x="2" y="3" width="16" height="14" rx="3"/><path d="M8 3v14M4.5 7h1.5M4.5 10h1.5"/></svg>
   </button>
@@ -335,6 +346,18 @@
 
     const map = L.map("map", { zoomControl: false }).setView([37.2707, -76.7075], 10);
     L.control.zoom({ position: "topright" }).addTo(map);
+
+    // credits show when the map opens, then tuck behind the (i) after 5 seconds or the first time you move the map
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank">Leaflet</a>');
+    const creditBtn = document.getElementById("credit");
+    function showCredits(on) {
+      document.body.classList.toggle("credits", on);
+      creditBtn.setAttribute("aria-expanded", on);
+    }
+    showCredits(true);
+    setTimeout(() => showCredits(false), 5000);
+    map.once("movestart zoomstart", () => showCredits(false));
+    creditBtn.onclick = () => showCredits(!document.body.classList.contains("credits"));
 
     /* ---------- the map style: free OpenFreeMap tiles, recolored to match the site ---------- */
     const ATTRIBUTION = '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>';
