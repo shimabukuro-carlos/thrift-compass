@@ -29,6 +29,11 @@
     body { margin: 0; font: 13px/1.45 "Space Mono", monospace; color: var(--ink); background: var(--paper); }
     button { font: inherit; color: inherit; }
 
+    /* nothing on the page can be highlighted, except typing in the search box */
+    html, body { user-select: none; -webkit-user-select: none; overscroll-behavior: none; }
+    input { user-select: text; -webkit-user-select: text; }
+    #topbar, #panel { touch-action: pan-y; }
+
     /* top bar */
     #topbar {
       position: fixed; z-index: 1001; top: 0; left: 0; right: 0; height: var(--bar); box-sizing: border-box;
@@ -59,6 +64,22 @@
     }
     #map::after { inset: var(--bezel); box-shadow: inset 0 0 0 2.5px var(--ink), inset 0 0 26px rgba(31,26,23,.3); }
     .leaflet-bottom.leaflet-right { right: var(--bezel); bottom: var(--bezel); }
+    .leaflet-top.leaflet-right { top: var(--bezel); right: var(--bezel); }
+
+    /* + and - buttons */
+    .leaflet-bar.leaflet-control { border: var(--line); border-radius: 8px; box-shadow: 3px 3px 0 var(--ink); overflow: hidden; }
+    .leaflet-bar a { width: 34px; height: 34px; line-height: 32px; background: var(--paper-hi); color: var(--ink); font: 700 20px/32px "Space Mono", monospace; border-bottom: 2px solid var(--ink); }
+    .leaflet-bar a:last-child { border-bottom: 0; }
+    .leaflet-bar a:hover { background: var(--paper); color: var(--maroon); width: 34px; height: 34px; }
+
+    /* little card when you hover a dot */
+    .leaflet-tooltip.card { width: 190px; padding: 8px 10px; border: var(--line); border-radius: 8px; background: var(--paper-hi); box-shadow: 3px 3px 0 var(--ink); color: var(--ink); font: 12px "Space Mono", monospace; white-space: normal; }
+    .leaflet-tooltip.card::before { display: none; }
+    .card b, .card small { display: block; }
+    .card small { color: var(--ink-3); margin: 2px 0 6px; }
+
+    /* store names when zoomed in close */
+    .store-label { width: max-content !important; font: 700 11px "Space Mono", monospace; color: var(--ink); white-space: nowrap; pointer-events: none; text-shadow: -1.5px 0 #F3E7CF, 1.5px 0 #F3E7CF, 0 -1.5px #F3E7CF, 0 1.5px #F3E7CF, 1px 1px #F3E7CF, -1px -1px #F3E7CF; }
 
     /* sidebar window */
     .win { background: var(--paper); border: var(--line); border-radius: 12px; box-shadow: 6px 6px 0 var(--ink); }
@@ -308,7 +329,13 @@
     const $ = id => document.getElementById(id);
     const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    // stop accidental pinch zoom on the page. The map still zooms because Leaflet handles its own pinch.
+    document.addEventListener("wheel", e => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+    document.addEventListener("gesturestart", e => e.preventDefault());
+
     const map = L.map("map", { zoomControl: false }).setView([37.2707, -76.7075], 10);
+    L.control.zoom({ position: "topright" }).addTo(map);
+
     /* ---------- the map style: free OpenFreeMap tiles, recolored to match the site ---------- */
     const ATTRIBUTION = '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>';
     const MAP_COLORS = [
@@ -415,6 +442,7 @@
       for (const k in KINDS) $("n_" + k).textContent = stores.filter(s => kindOf(s) === k && passes(s)).length;
       $("nAll").textContent = stores.filter(passes).length;
       drawNear();
+      drawLabels();
     }
 
     function drawNear() {
@@ -501,10 +529,7 @@
       markerStyle(i, true);
       document.body.classList.remove("closed");
 
-      const k = kindOf(s);
-      $("sTags").innerHTML = `<span class="tag ${k}">${KINDS[k]}</span>` +
-        (s.ownership === "independent" ? `<span class="tag soft">Local</span>` : "") +
-        (has(s, "charity") ? `<span class="tag soft">Charity</span>` : "");
+      $("sTags").innerHTML = tagPills(s);
       $("sName").textContent = s.name;
       $("sAddr").textContent = `${s.address}, ${s.city}`;
       showDistance(s);
@@ -571,6 +596,42 @@
       if (r) r.classList.toggle("open");
     });
 
+    function tagPills(s) {
+      const k = kindOf(s);
+      return `<span class="tag ${k}">${KINDS[k]}</span>` +
+        (s.ownership === "independent" ? `<span class="tag soft">Local</span>` : "") +
+        (has(s, "charity") ? `<span class="tag soft">Charity</span>` : "");
+    }
+
+    function hoverCard(s) {
+      const away = start ? ` · ${dist(stores.indexOf(s)).toFixed(1)} mi` : "";
+      return `<b>${esc(s.name)}</b><small>${esc(s.city)}${away}</small><div class="tags">${tagPills(s)}</div>`;
+    }
+
+    /* ---------- store names on the map when you're zoomed in close ---------- */
+    const LABEL_ZOOM = 13;
+    const labels = L.layerGroup().addTo(map);
+    function drawLabels() {
+      labels.clearLayers();
+      if (map.getZoom() < LABEL_ZOOM || !markers.length) return;
+      const active = kind || query || filters.size, bounds = map.getBounds(), taken = [];
+      // the selected store gets its name first, then skip any name that would overlap one already placed
+      const ids = selected === null ? order : [selected, ...order.filter(i => i !== selected)];
+      ids.forEach(i => {
+        const s = stores[i];
+        if ((active && !matches(s)) || !bounds.contains([s.lat, s.lon])) return;
+        const p = map.latLngToContainerPoint([s.lat, s.lon]);
+        const box = { l: p.x + 10, t: p.y - 9, r: p.x + 14 + s.name.length * 6.8, b: p.y + 9 };
+        if (taken.some(o => box.l < o.r && box.r > o.l && box.t < o.b && box.b > o.t)) return;
+        taken.push(box);
+        L.marker([s.lat, s.lon], {
+          interactive: false, keyboard: false,
+          icon: L.divIcon({ className: "store-label", html: esc(s.name), iconSize: null, iconAnchor: [-10, 8] })
+        }).addTo(labels);
+      });
+    }
+    map.on("moveend zoomend", drawLabels);
+
     /* ---------- stores + map dots ---------- */
     fetch("data/stores.json")
       .then(r => r.json())
@@ -583,6 +644,7 @@
             radius: 6, color: "#1F1A17", weight: 2.5, fillColor: PIN[kindOf(s)], fillOpacity: 1
           }).addTo(map);
           m.on("click", () => { if (!document.body.classList.contains("picking")) select(i); });
+          m.bindTooltip(() => hoverCard(s), { direction: "top", offset: [0, -8], opacity: 1, className: "card" });
           return m;
         });
         drawList();
