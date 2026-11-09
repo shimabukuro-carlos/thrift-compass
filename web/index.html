@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Thrift Compass</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
   <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -58,7 +59,6 @@
     }
     #map::after { inset: var(--bezel); box-shadow: inset 0 0 0 2.5px var(--ink), inset 0 0 26px rgba(31,26,23,.3); }
     .leaflet-bottom.leaflet-right { right: var(--bezel); bottom: var(--bezel); }
-    .leaflet-tile-pane { filter: sepia(.2) hue-rotate(-20deg) saturate(.75); }
 
     /* sidebar window */
     .win { background: var(--paper); border: var(--line); border-radius: 12px; box-shadow: 6px 6px 0 var(--ink); }
@@ -160,10 +160,6 @@
     .key { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--ink); border-radius: 50%; margin-right: 5px; vertical-align: -1px; background: #6B3035; }
     .key.clothes { background: #E0A526; }
     .key.vintage { background: #C8642C; }
-    #legend {
-      position: fixed; z-index: 999; right: calc(var(--bezel) + 12px); bottom: calc(var(--bezel) + 30px);
-      display: grid; gap: 6px; padding: 10px 12px; font-size: 12px; font-weight: 700; border-radius: 10px; box-shadow: 4px 4px 0 var(--ink);
-    }
     .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .btns button {
       height: 40px; border: var(--line); border-radius: 8px; background: var(--paper-hi); font-weight: 700; cursor: pointer;
@@ -301,25 +297,47 @@
 
   <div id="toast" class="win" hidden><span id="toastMsg"></span><button id="toastX">Cancel</button></div>
 
-  <div id="legend" class="win">
-    <span><i class="key thrift"></i>Thrift stores</span>
-    <span><i class="key clothes"></i>Clothes</span>
-    <span><i class="key vintage"></i>Vintage</span>
-  </div>
-
   <button class="toggle" id="open" aria-label="Show sidebar">
     <svg viewBox="0 0 20 20"><rect x="2" y="3" width="16" height="14" rx="3"/><path d="M8 3v14M4.5 7h1.5M4.5 10h1.5"/></svg>
   </button>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.1.3/leaflet-maplibre-gl.js"></script>
   <script>
     const $ = id => document.getElementById(id);
     const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const map = L.map("map", { zoomControl: false }).setView([37.2707, -76.7075], 10);
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors"
-    }).addTo(map);
+    /* ---------- the map style: free OpenFreeMap tiles, recolored to match the site ---------- */
+    const ATTRIBUTION = '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>';
+    const MAP_COLORS = [
+      [/^background$/, "background-color", "#F3E7CF"],
+      [/^water$/, "fill-color", "#8FC7C2"],
+      [/^waterway$/, "line-color", "#8FC7C2"],
+      [/^(park|landcover_wood)$/, "fill-color", "#E3DCB4"],
+      [/^landuse_residential$/, "fill-color", "#EFE1C6"],
+      [/^building$/, "fill-color", "#E6D6B6"],
+      [/^(highway_path|highway_minor)$/, "line-color", "#DCC8A3"],
+      [/^highway_major_(inner|subtle)$/, "line-color", "#B98F62"],
+      [/^highway_major_casing$/, "line-color", "#A67C52"],
+      [/^(tunnel_)?highway_motorway_(inner|subtle|bridge_inner)$|^tunnel_motorway_inner$/, "line-color", "#9A6B45"],
+      [/motorway.*casing/, "line-color", "#7E5536"],
+    ];
+    const MAP_HIDE = /^(ne2_shaded|boundary|railway|aeroway|airport|road_shield|highway-shield|road_area_pier|road_pier|label_country|landcover_(ice|glacier))/;
+
+    fetch("https://tiles.openfreemap.org/styles/positron")
+      .then(r => r.json())
+      .then(style => {
+        style.layers = style.layers.filter(l => !MAP_HIDE.test(l.id));
+        style.layers.forEach(l => {
+          l.paint = l.paint || {};
+          MAP_COLORS.forEach(([match, prop, color]) => { if (match.test(l.id)) l.paint[prop] = color; });
+          if (l.type === "symbol") { l.paint["text-color"] = "#5A3A22"; l.paint["text-halo-color"] = "#F3E7CF"; l.paint["text-halo-width"] = 1.6; }
+        });
+        L.maplibreGL({ style, attribution: ATTRIBUTION }).addTo(map);
+      })
+      .catch(() => L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap contributors" }).addTo(map));
 
     // sidebar hide / show
     $("close").onclick = () => document.body.classList.add("closed");
