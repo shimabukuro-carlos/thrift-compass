@@ -86,6 +86,10 @@
     .leaflet-tooltip.card::before { display: none; }
     .card b, .card small { display: block; }
     .card small { color: var(--ink-3); margin: 2px 0 6px; }
+    .status { font-weight: 700; }
+    .status.open { color: #2F7A76; }
+    .status.shut { color: var(--maroon); }
+    .card .status { margin-bottom: 6px; }
 
     /* store names when zoomed in close */
     .store-label { width: max-content !important; font: 700 11px "Space Mono", monospace; color: var(--ink); white-space: nowrap; pointer-events: none; text-shadow: -1.5px 0 #F3E7CF, 1.5px 0 #F3E7CF, 0 -1.5px #F3E7CF, 0 1.5px #F3E7CF, 1px 1px #F3E7CF, -1px -1px #F3E7CF; }
@@ -318,6 +322,7 @@
           <h2 id="sName"></h2>
           <div class="addr" id="sAddr"></div>
           <div class="dist" id="sDist"></div>
+          <div id="sHours"></div>
           <a class="btn" id="sDir" target="_blank" rel="noopener">Directions</a>
           <div id="sReviews"></div>
         </div>
@@ -553,6 +558,7 @@
       document.body.classList.remove("closed");
 
       $("sTags").innerHTML = tagPills(s);
+      $("sHours").innerHTML = statusHtml(s);
       $("sName").textContent = s.name;
       $("sAddr").textContent = `${s.address}, ${s.city}`;
       showDistance(s);
@@ -598,6 +604,9 @@
         .then(d => {
           if (d.error) throw d.error;
           reviewCache[id] = d;
+          // keep Google's hours so hovering this store works from now on
+          if (d.hours && d.hours.length) stores.filter(x => x.google_id === id).forEach(x => x.hours = d.hours);
+          if (stores[selected] && stores[selected].google_id === id) $("sHours").innerHTML = statusHtml(stores[selected]);
           if (stores[selected] && stores[selected].google_id === id) renderReviews(d);
         })
         .catch(() => {
@@ -626,9 +635,39 @@
         (has(s, "charity") ? `<span class="tag soft">Charity</span>` : "");
     }
 
+    /* ---------- open or closed right now, in Virginia time. Hours come from OpenStreetMap or from the Google call a click already makes ---------- */
+    const WEEK = 7 * 24 * 60, DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    function nowInVirginia() {
+      const p = {};
+      new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short", hour: "numeric", minute: "numeric", hourCycle: "h23" })
+        .formatToParts(new Date()).forEach(x => p[x.type] = x.value);
+      return DAYS.indexOf(p.weekday) * 1440 + (+p.hour) * 60 + (+p.minute);
+    }
+    function clock(m) {
+      m = m % 1440;
+      const h = Math.floor(m / 60), min = m % 60;
+      return `${h % 12 || 12}${min ? ":" + String(min).padStart(2, "0") : ""} ${h < 12 ? "AM" : "PM"}`;
+    }
+    // returns { open, text }, or null when we don't have hours for that store
+    function hoursStatus(s) {
+      const h = typeof s.hours === "string" ? JSON.parse(s.hours) : s.hours;
+      if (!h || !h.length) return null;
+      if (h.length === 1 && h[0][0] === 0 && h[0][1] === WEEK) return { open: true, text: "Open 24 hours" };
+      const now = nowInVirginia();
+      const period = h.find(([a, b]) => (now >= a && now < b) || (now + WEEK >= a && now + WEEK < b));
+      if (period) return { open: true, text: `Open until ${clock(period[1])}` };
+      const next = h.map(([a]) => a).sort((x, y) => ((x - now + WEEK) % WEEK) - ((y - now + WEEK) % WEEK))[0];
+      const sameDay = Math.floor(next / 1440) === Math.floor(now / 1440) && next > now;
+      return { open: false, text: `Closed until ${sameDay ? "" : DAYS[Math.floor(next / 1440)] + " "}${clock(next)}` };
+    }
+    function statusHtml(s) {
+      const st = hoursStatus(s);
+      return st ? `<div class="status ${st.open ? "open" : "shut"}">${st.text}</div>` : "";
+    }
+
     function hoverCard(s) {
       const away = start ? ` · ${dist(stores.indexOf(s)).toFixed(1)} mi` : "";
-      return `<b>${esc(s.name)}</b><small>${esc(s.city)}${away}</small><div class="tags">${tagPills(s)}</div>`;
+      return `<b>${esc(s.name)}</b><small>${esc(s.city)}${away}</small>${statusHtml(s)}<div class="tags">${tagPills(s)}</div>`;
     }
 
     /* ---------- store names on the map when you're zoomed in close ---------- */
