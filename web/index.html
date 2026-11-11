@@ -204,11 +204,6 @@
     }
     .btns button:first-child { background: var(--maroon); color: var(--paper); }
     .btns button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
-    /* type an address */
-    .addr { display: flex; gap: 8px; margin-top: 12px; }
-    .addr input { flex: 1; min-width: 0; height: 38px; border: var(--line); border-radius: 8px; padding: 0 10px; background: var(--paper-hi); font: 12px "Space Mono", monospace; color: var(--ink); outline: none; }
-    .addr button { height: 38px; padding: 0 12px; border: var(--line); border-radius: 8px; background: var(--paper-hi); font-weight: 700; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
-    .addr button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
     .reset { border: 0; background: none; padding: 8px 0 0; font-weight: 700; font-size: 12px; text-decoration: underline; cursor: pointer; color: var(--ink-3); }
     .dist { margin-top: 6px; font-weight: 700; }
 
@@ -513,8 +508,7 @@
       $("nearBox").innerHTML = start
         ? `<ul class="rows">${order.filter(i => passes(stores[i])).slice(0, 5).map(i => `<li><button data-i="${i}"><i class="dot ${kindOf(stores[i])}"></i><div><b>${esc(stores[i].name)}</b><small>${esc(stores[i].city)}</small></div><em>${dist(i).toFixed(1)} mi</em></button></li>`).join("")}</ul>`
         + `<button class="reset" data-act="reset">Change start</button>`
-        : `<div class="btns"><button data-act="locate">Use my location</button><button data-act="pick">Pick on map</button></div>` +
-          `<form class="addr" id="addr"><input name="a" placeholder="Or type an address" autocomplete="street-address"><button>Go</button></form>`;
+        : `<div class="btns"><button data-act="locate">Use my location</button><button data-act="pick">Pick on map</button></div>`;
       $("loc").classList.toggle("on", startKind === "me");
     }
 
@@ -550,20 +544,6 @@
       if (a.dataset.act === "locate") locate();
       else if (a.dataset.act === "pick") pick(true);
       else clearStart();
-    });
-    // an address goes through Caroline's addr_to_coords() (web/api/geocode.py)
-    $("nearBox").addEventListener("submit", async e => {
-      e.preventDefault();
-      const address = e.target.a.value.trim();
-      if (!address) return;
-      try {
-        const r = await fetch("/api/geocode?address=" + encodeURIComponent(address));
-        if (!r.ok) throw 0;
-        const { lat, lon } = await r.json();
-        if (miles([lat, lon], [37.2707, -76.7075]) > 45) return pick(true, "That's too far away. Tap the map instead.");
-        setStart(lat, lon, "address");
-        map.flyTo([lat, lon], 12, { duration: reduceMotion ? 0 : 0.8 });
-      } catch { pick(true, "Couldn't find that address. Tap the map instead."); }
     });
 
     /* ---------- where you start: your location, or a spot you tap on the map ---------- */
