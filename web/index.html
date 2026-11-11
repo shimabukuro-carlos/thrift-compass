@@ -163,7 +163,10 @@
     /* filter chips */
     .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 18px 10px; }
     .chip { height: 30px; padding: 0 12px; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper-hi); font-size: 12px; font-weight: 700; cursor: pointer; }
-    .chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+    .chip[aria-pressed="true"], select.chip.on { background: var(--ink); color: var(--paper); }
+    select.chip { appearance: none; padding-right: 26px; font-family: inherit; color: var(--ink);
+      background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+      background-position: right 13px center, right 8px center; background-size: 5px 5px; background-repeat: no-repeat; }
 
     /* list of stores */
     .rhead { display: flex; align-items: flex-end; justify-content: space-between; padding: 6px 18px 10px; border-bottom: 2.5px dashed var(--ink); margin-bottom: 4px; }
@@ -201,6 +204,12 @@
     }
     .btns button:first-child { background: var(--maroon); color: var(--paper); }
     .btns button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    /* type an address */
+    .addr { display: flex; gap: 8px; margin-top: 12px; }
+    .addr input { flex: 1; min-width: 0; height: 38px; border: var(--line); border-radius: 8px; padding: 0 10px; background: var(--paper-hi); font: 12px "Space Mono", monospace; color: var(--ink); outline: none; }
+    .addr button { height: 38px; padding: 0 12px; border: var(--line); border-radius: 8px; background: var(--paper-hi); font-weight: 700; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+    .addr button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    .reset { border: 0; background: none; padding: 8px 0 0; font-weight: 700; font-size: 12px; text-decoration: underline; cursor: pointer; color: var(--ink-3); }
     .dist { margin-top: 6px; font-weight: 700; }
 
     /* your start on the map */
@@ -286,9 +295,14 @@
       </button>
     </div>
     <div class="chips">
-      <button class="chip" data-f="local" aria-pressed="false">Local</button>
-      <button class="chip" data-f="gives" aria-pressed="false">Charity</button>
-      <button class="chip" data-f="near" aria-pressed="false">Within 10 mi</button>
+      <button class="chip" data-own="independent" aria-pressed="false">Local</button>
+      <button class="chip" data-own="chain" aria-pressed="false">Chain</button>
+      <button class="chip" data-tag="charity" aria-pressed="false">Charity</button>
+      <button class="chip" data-tag="consignment" aria-pressed="false">Consignment</button>
+      <select class="chip" id="maxDist" aria-label="Distance">
+        <option value="">Any distance</option><option value="5">Within 5 mi</option>
+        <option value="10">Within 10 mi</option><option value="20">Within 20 mi</option>
+      </select>
     </div>
 
     <div class="views">
@@ -411,19 +425,39 @@
     const kindOf = s => has(s, "vintage") ? "vintage"
       : has(s, "consignment") || s.category === "second_hand_clothing_store" ? "clothes" : "thrift";
     const titles = { all: "All stores", ...KINDS };
-    const filters = new Set();
+    // what the shopper wants: the same three inputs as Caroline's recommend_stores()
+    const want = { ownership: new Set(), tags: new Set(), maxDist: null };
     let stores = [], markers = [], kind = null, query = "", selected = null;
     let start = null, startKind = null, startDot = null, order = [];
 
-    // miles between two [lat, lon] points (flat-earth is plenty for 30 miles)
-    function miles(a, b) {
-      const dy = (a[0] - b[0]) * 69, dx = (a[1] - b[1]) * 69 * Math.cos(a[0] * Math.PI / 180);
-      return Math.hypot(dx, dy);
+    // miles between two [lat, lon] points on the real (slightly squashed) earth,
+    // the same answer as geopy's geodesic() in Caroline's code (Vincenty's formula)
+    function miles(p, q) {
+      const r = Math.PI / 180, A = 6378137, f = 1 / 298.257223563, B = A * (1 - f);
+      const U1 = Math.atan((1 - f) * Math.tan(p[0] * r)), U2 = Math.atan((1 - f) * Math.tan(q[0] * r)), L = (q[1] - p[1]) * r;
+      const s1 = Math.sin(U1), c1 = Math.cos(U1), s2 = Math.sin(U2), c2 = Math.cos(U2);
+      let lam = L, sinS, cosS, sig, cos2a, cos2m;
+      for (let k = 0; k < 100; k++) {
+        const sl = Math.sin(lam), cl = Math.cos(lam);
+        sinS = Math.hypot(c2 * sl, c1 * s2 - s1 * c2 * cl);
+        if (sinS === 0) return 0;
+        cosS = s1 * s2 + c1 * c2 * cl; sig = Math.atan2(sinS, cosS);
+        const sa = c1 * c2 * sl / sinS; cos2a = 1 - sa * sa;
+        cos2m = cos2a ? cosS - 2 * s1 * s2 / cos2a : 0;
+        const C = f / 16 * cos2a * (4 + f * (4 - 3 * cos2a)), prev = lam;
+        lam = L + (1 - C) * f * sa * (sig + C * sinS * (cos2m + C * cosS * (2 * cos2m * cos2m - 1)));
+        if (Math.abs(lam - prev) < 1e-12) break;
+      }
+      const u2 = cos2a * (A * A - B * B) / (B * B);
+      const AA = 1 + u2 / 16384 * (4096 + u2 * (-768 + u2 * (320 - 175 * u2))), BB = u2 / 1024 * (256 + u2 * (-128 + u2 * (74 - 47 * u2)));
+      const dS = BB * sinS * (cos2m + BB / 4 * (cosS * (2 * cos2m * cos2m - 1) - BB / 6 * cos2m * (4 * sinS * sinS - 3) * (4 * cos2m * cos2m - 3)));
+      return B * AA * (sig - dS) / 1609.344;
     }
     const dist = i => start ? miles(start, [stores[i].lat, stores[i].lon]) : null;
+    // closest first, then by name, like recommend_stores()
     function sortStores() {
       order = stores.map((_, i) => i);
-      if (start) order.sort((a, b) => dist(a) - dist(b));
+      if (start) order.sort((a, b) => dist(a) - dist(b) || (stores[a].name < stores[b].name ? -1 : stores[a].name > stores[b].name ? 1 : 0));
     }
 
     /* ---------- which screen the sidebar shows ---------- */
@@ -438,13 +472,15 @@
     }
 
     /* ---------- list ---------- */
-    // the chips: Local, Charity, Within 10 mi
+    // Caroline's recommend_stores() rules (recommendations/recommendations.py):
+    // ownership is any of the picks, tags need at least one match, distance only counts once there's a start
     function passes(s) {
-      if (filters.has("local") && s.ownership !== "independent") return false;
-      if (filters.has("gives") && !has(s, "charity")) return false;
-      if (filters.has("near") && start && miles(start, [s.lat, s.lon]) > 10) return false;
+      if (want.ownership.size && !want.ownership.has(s.ownership)) return false;
+      if (want.tags.size && !(s.tags || "").split("|").some(t => want.tags.has(t))) return false;
+      if (want.maxDist !== null && start && miles(start, [s.lat, s.lon]) > want.maxDist) return false;
       return true;
     }
+    const picking = () => want.ownership.size || want.tags.size || want.maxDist !== null;
 
     function matches(s) {
       if (kind && kind !== "all" && kindOf(s) !== kind) return false;
@@ -453,7 +489,7 @@
     }
 
     function drawList() {
-      const active = kind || query || filters.size;
+      const active = kind || query || picking();
       let html = "", n = 0;
       order.forEach(i => {
         const s = stores[i], ok = !active || matches(s);
@@ -476,20 +512,27 @@
     function drawNear() {
       $("nearBox").innerHTML = start
         ? `<ul class="rows">${order.filter(i => passes(stores[i])).slice(0, 5).map(i => `<li><button data-i="${i}"><i class="dot ${kindOf(stores[i])}"></i><div><b>${esc(stores[i].name)}</b><small>${esc(stores[i].city)}</small></div><em>${dist(i).toFixed(1)} mi</em></button></li>`).join("")}</ul>`
-        : `<div class="btns"><button data-act="locate">Use my location</button><button data-act="pick">Pick on map</button></div>`;
+        + `<button class="reset" data-act="reset">Change start</button>`
+        : `<div class="btns"><button data-act="locate">Use my location</button><button data-act="pick">Pick on map</button></div>` +
+          `<form class="addr" id="addr"><input name="a" placeholder="Or type an address" autocomplete="street-address"><button>Go</button></form>`;
       $("loc").classList.toggle("on", startKind === "me");
     }
 
     function showList(k) { kind = k; drawList(); show(1); }
 
     document.querySelectorAll(".tile, .allbar").forEach(t => t.onclick = () => showList(t.dataset.kind));
-    document.querySelectorAll(".chip").forEach(c => c.onclick = () => {
-      const f = c.dataset.f, on = !filters.has(f);
-      if (on) filters.add(f); else filters.delete(f);
+    document.querySelectorAll("button.chip").forEach(c => c.onclick = () => {
+      const set = c.dataset.own ? want.ownership : want.tags, v = c.dataset.own || c.dataset.tag, on = !set.has(v);
+      if (on) set.add(v); else set.delete(v);
       c.setAttribute("aria-pressed", on);
-      if (f === "near" && on && !start) locate();  // needs a start point first
       drawList();
     });
+    $("maxDist").onchange = e => {
+      want.maxDist = e.target.value ? +e.target.value : null;
+      e.target.classList.toggle("on", want.maxDist !== null);
+      if (want.maxDist !== null && !start) locate();  // distance needs a start point first
+      drawList();
+    };
     $("back").onclick = () => { kind = null; query = ""; $("q").value = ""; drawList(); show(0); };
     $("q").addEventListener("input", e => {
       query = e.target.value.trim().toLowerCase();
@@ -503,7 +546,24 @@
       const b = e.target.closest("button[data-i]");
       if (b) return select(+b.dataset.i);
       const a = e.target.closest("[data-act]");
-      if (a) a.dataset.act === "locate" ? locate() : pick(true);
+      if (!a) return;
+      if (a.dataset.act === "locate") locate();
+      else if (a.dataset.act === "pick") pick(true);
+      else clearStart();
+    });
+    // an address goes through Caroline's addr_to_coords() (web/api/geocode.py)
+    $("nearBox").addEventListener("submit", async e => {
+      e.preventDefault();
+      const address = e.target.a.value.trim();
+      if (!address) return;
+      try {
+        const r = await fetch("/api/geocode?address=" + encodeURIComponent(address));
+        if (!r.ok) throw 0;
+        const { lat, lon } = await r.json();
+        if (miles([lat, lon], [37.2707, -76.7075]) > 45) return pick(true, "That's too far away. Tap the map instead.");
+        setStart(lat, lon, "address");
+        map.flyTo([lat, lon], 12, { duration: reduceMotion ? 0 : 0.8 });
+      } catch { pick(true, "Couldn't find that address. Tap the map instead."); }
     });
 
     /* ---------- where you start: your location, or a spot you tap on the map ---------- */
@@ -511,6 +571,13 @@
       start = [lat, lon]; startKind = how;
       if (!startDot) startDot = L.marker(start, { icon: L.divIcon({ className: "me", iconSize: [22, 22] }), interactive: false }).addTo(map);
       else startDot.setLatLng(start);
+      sortStores(); drawList();
+      if (selected !== null) showDistance(stores[selected]);
+    }
+
+    function clearStart() {
+      start = null; startKind = null;
+      if (startDot) { startDot.remove(); startDot = null; }
       sortStores(); drawList();
       if (selected !== null) showDistance(stores[selected]);
     }
@@ -676,7 +743,7 @@
     function drawLabels() {
       labels.clearLayers();
       if (map.getZoom() < LABEL_ZOOM || !markers.length) return;
-      const active = kind || query || filters.size, bounds = map.getBounds(), taken = [];
+      const active = kind || query || picking(), bounds = map.getBounds(), taken = [];
       // the selected store gets its name first, then skip any name that would overlap one already placed
       const ids = selected === null ? order : [selected, ...order.filter(i => i !== selected)];
       ids.forEach(i => {
