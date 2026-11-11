@@ -71,9 +71,10 @@ def recommend_stores(location: tuple[float, float] | str, max_dist: float = 5, o
         coords = addr_to_coords(location)
         if coords is None:
             raise ValueError('No location found for {location}')
-        else:
-            if len(coords) != 2:
-                raise ValueError('Coordinates must be address or (lat, lon) pair.')
+    else:
+        coords = tuple(location)
+        if len(coords) != 2:
+            raise ValueError('Coordinates must be address or (lat, lon) pair.')
 
     results = []
     for store in load_stores():
@@ -112,7 +113,7 @@ if __name__ == "__main__":
 
     # example run - address, dist 5, no preference on ownership or tags
     recs = recommend_stores(
-        '200 Stadium Drive, Williamsburg, VA, 23185',
+        (37.271133, -76.716614),
         max_dist = 5,
         ownership = ['independent'],
         tags = []
