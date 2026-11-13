@@ -1,0 +1,58 @@
+[
+  {
+    "id": "03f01061-40d2-4f02-94c4-46f0ca5b800b",
+    "name": "Two Trolls",
+    "address": "5251 John Tyler Hwy #57",
+    "city": "Williamsburg",
+    "category": "second_hand_store",
+    "lat": 37.258270263671875,
+    "lon": -76.74120330810547,
+    "google_id": "ChIJdZ-a9PKLsIkRVAQWc_-jnD4",
+    "ownership": "independent",
+    "tags": null,
+    "hours": "[[3480,3900],[4920,5340],[6360,6780],[7800,8220],[9240,9600]]",
+    "miles_from_user": 1.6197630062503479
+  },
+  {
+    "id": "987f8ab7-d13c-4919-b863-e38f9a325aff",
+    "name": "3 Doors Down",
+    "address": "4506 John Tyler Hwy",
+    "city": "Williamsburg",
+    "category": "second_hand_store",
+    "lat": 37.253013610839844,
+    "lon": -76.7647705078125,
+    "google_id": "ChIJdYQcCQyLsIkRZ6RJWNjSQyI",
+    "ownership": "independent",
+    "tags": null,
+    "hours": null,
+    "miles_from_user": 2.933739653549138
+  },
+  {
+    "id": "7e753c9e-990b-4cd4-9c06-4ef8afd98de1",
+    "name": "New2You Thrift Store",
+    "address": "4500 John Tyler Hwy",
+    "city": "Williamsburg",
+    "category": "second_hand_store",
+    "lat": 37.25294494628906,
+    "lon": -76.76497650146484,
+    "google_id": "ChIJTR48tmmKsIkRsXp04evZmZ8",
+    "ownership": "independent",
+    "tags": "charity",
+    "hours": null,
+    "miles_from_user": 2.9460303948921553
+  },
+  {
+    "id": "0187c81f-0c1d-4d8f-8415-f9be855f4614",
+    "name": "Parker & Peony Boutique",
+    "address": "5711 Richmond Rd Ste 83",
+    "city": "Williamsburg",
+    "category": "second_hand_clothing_store",
+    "lat": 37.32020950317383,
+    "lon": -76.73741149902344,
+    "google_id": null,
+    "ownership": "independent",
+    "tags": null,
+    "hours": null,
+    "miles_from_user": 3.5731068502069405
+  }
+]

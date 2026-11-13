@@ -119,7 +119,7 @@ if __name__ == "__main__":
         tags = []
         )
 
-    Path("store_recs.json").write_text(json.dumps(recs, indent=2))
+    Path("recommendations/store_recs.json").write_text(json.dumps(recs, indent=2))
 
     for s in recs:
         print(f"{s['miles_from_user']:5.1f} mi  {s['name']} ({s['city']}, {s['ownership']}, {s['tags'] or 'no tags'})")
